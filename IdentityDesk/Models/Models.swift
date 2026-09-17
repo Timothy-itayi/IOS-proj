@@ -45,7 +45,7 @@ struct Role: Codable, Identifiable, Equatable {
     let name: String
 }
 
-struct Group: Codable, Identifiable, Equatable {
+struct UserGroup: Codable, Identifiable, Equatable {
     let id: String
     let name: String
 }
@@ -130,7 +130,7 @@ struct SharedBaseline: Codable {
     let users: [User]
     let departments: [Department]
     let roles: [Role]
-    let groups: [Group]
+    let groups: [UserGroup]
     let policies: [Policy]
 }
 

@@ -14,7 +14,7 @@ class ScenarioStore: ObservableObject {
     @Published var messages: [Message] = []
     @Published var documents: [Document] = []
     @Published var roles: [Role] = []
-    @Published var groups: [Group] = []
+    @Published var groups: [UserGroup] = []
     @Published var policies: [Policy] = []
     
     @Published var selectedTicketId: String?
@@ -140,7 +140,7 @@ class ScenarioStore: ObservableObject {
         return roles.first(where: { $0.id == id })
     }
     
-    func group(withId id: String) -> Group? {
+    func group(withId id: String) -> UserGroup? {
         groups.first(where: { $0.id == id })
     }
     
