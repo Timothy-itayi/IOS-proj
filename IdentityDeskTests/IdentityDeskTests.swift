@@ -90,13 +90,14 @@ final class PhaseATests: XCTestCase {
     }
     
     func testCloseTicketWithNotes() {
-        let initialTicketCount = store.tickets.count
         let notes = "Password reset completed. User verified via email."
         
         store.closeTicket("INC-7001", notes: notes)
         
-        XCTAssertEqual(store.tickets.count, initialTicketCount - 1, "Ticket count should decrease by 1")
+        // Closing INC-7001 completes Phase A and advances to Phase B (which seeds INC-7002)
         XCTAssertNil(store.tickets.first { $0.id == "INC-7001" }, "INC-7001 should be removed from queue")
+        XCTAssertNotNil(store.tickets.first { $0.id == "INC-7002" }, "Phase B ticket INC-7002 should appear after phase advance")
+        XCTAssertEqual(store.currentPhase?.id, "B_account_unlock", "Should advance to Phase B after closing Phase A ticket")
     }
     
     func testPhaseACompletionAdvancesPhase() {
@@ -242,6 +243,8 @@ final class PhaseATests: XCTestCase {
     }
     
     func testSector7EmptyFieldsPhaseF() {
+        // Phase F depends on "post_maintenance" flag from Phase E completion
+        store.completedFlags.insert("post_maintenance")
         store.currentPhaseIndex = 5
         store.advanceToNextPhase()
         
@@ -267,6 +270,8 @@ final class PhaseATests: XCTestCase {
     }
     
     func testEntitlementEmptyFieldRenderingInheritedNoParent() {
+        // Phase F depends on "post_maintenance" flag from Phase E completion
+        store.completedFlags.insert("post_maintenance")
         store.currentPhaseIndex = 5
         store.advanceToNextPhase()
         
