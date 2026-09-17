@@ -21,6 +21,7 @@ class ScenarioStore: ObservableObject {
     @Published var selectedUserId: String?
     @Published var selectedDepartmentId: String?
     @Published var selectedPolicyId: String?
+    @Published var selectedWindow: Window = .tickets
     
     var operatorName: String {
         scenario?.operator.displayName ?? "Daniel"

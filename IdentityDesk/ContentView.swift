@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var store = ScenarioStore()
-    @State private var selectedWindow: Window = .tickets
     
     var body: some View {
         ZStack {
@@ -56,16 +55,16 @@ struct ContentView: View {
         HStack(spacing: 0) {
             ForEach(Window.allCases, id: \.self) { window in
                 Button(action: {
-                    selectedWindow = window
+                    store.selectedWindow = window
                 }) {
                     Text(window.rawValue)
                         .font(.system(size: 13, weight: .medium, design: .monospaced))
-                        .foregroundColor(selectedWindow == window ?
+                        .foregroundColor(store.selectedWindow == window ?
                             Color(red: 1.0, green: 0.7, blue: 0.0) :
                             Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(selectedWindow == window ?
+                        .background(store.selectedWindow == window ?
                             Color(red: 0.2, green: 0.2, blue: 0.2) :
                             Color(red: 0.12, green: 0.12, blue: 0.12))
                 }
@@ -77,7 +76,7 @@ struct ContentView: View {
     
     private var contentArea: some View {
         Group {
-            switch selectedWindow {
+            switch store.selectedWindow {
             case .tickets:
                 TicketQueueView(store: store)
             case .user:

@@ -21,6 +21,7 @@ struct PolicyView: View {
                             policyHeader(policy: policy)
                             rulesSection(policy: policy)
                             appliesSection(policy: policy)
+                            linkedDepartmentsSection(policy: policy)
                         }
                         .padding()
                     }
@@ -81,6 +82,37 @@ struct PolicyView: View {
             Text(policy.appliesTo)
                 .font(.system(size: 13, design: .monospaced))
                 .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+        }
+        .padding()
+        .panelStyle()
+    }
+    
+    private func linkedDepartmentsSection(policy: Policy) -> some View {
+        let linkedDepts = store.departments.filter { $0.policyIds.contains(policy.id) }
+        
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                FieldLabel(text: "LINKED DEPARTMENTS")
+                Spacer()
+                Text("\(linkedDepts.count) linked")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
+            }
+            
+            if linkedDepts.isEmpty {
+                EmptyFieldText(value: nil)
+            } else {
+                ForEach(linkedDepts) { dept in
+                    Button(action: {
+                        store.selectedDepartmentId = dept.id
+                        store.selectedWindow = .dept
+                    }) {
+                        Text("• \(dept.name)")
+                            .font(.system(size: 13, design: .monospaced))
+                            .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                    }
+                }
+            }
         }
         .padding()
         .panelStyle()
