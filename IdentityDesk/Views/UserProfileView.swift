@@ -89,7 +89,6 @@ struct UserProfileView: View {
                         Text(dept.name)
                             .font(.system(size: 13, design: .monospaced))
                             .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
-                            .underline()
                     }
                 } else {
                     EmptyFieldText(value: nil)
@@ -125,7 +124,6 @@ struct UserProfileView: View {
             HStack {
                 Text("View Authentication History")
                     .font(.system(size: 13, design: .monospaced))
-                    .underline()
                 Spacer()
                 Text("→")
             }
