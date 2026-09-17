@@ -58,16 +58,26 @@ final class PhaseATests: XCTestCase {
     }
     
     func testResetPasswordUpdatesUserStatus() {
-        let sarah = store.user(withId: "U-SARAH")
-        XCTAssertNotNil(sarah, "Sarah should exist before reset")
+        var james = User(
+            id: "U-TEST-LOCKED",
+            displayName: "Test User",
+            status: "LOCKED",
+            roleId: "R-EMPLOYEE",
+            managerId: nil,
+            departmentId: "D-IT",
+            groupIds: []
+        )
         
-        let initialStatus = sarah?.status
+        store.users.append(james)
         
-        store.resetPassword(userId: "U-SARAH")
+        let initialUser = store.user(withId: "U-TEST-LOCKED")
+        XCTAssertEqual(initialUser?.status, "LOCKED", "User should start as LOCKED")
         
-        let updatedSarah = store.user(withId: "U-SARAH")
-        XCTAssertEqual(updatedSarah?.status, "ACTIVE", "Sarah should remain ACTIVE after password reset")
-        XCTAssertEqual(initialStatus, "ACTIVE", "Sarah was already ACTIVE (password reset doesn't change status in Phase A)")
+        store.resetPassword(userId: "U-TEST-LOCKED")
+        
+        let updatedUser = store.user(withId: "U-TEST-LOCKED")
+        XCTAssertEqual(updatedUser?.status, "ACTIVE", "User should be ACTIVE after password reset")
+        XCTAssertNotEqual(initialUser?.status, updatedUser?.status, "Status should have changed from LOCKED to ACTIVE")
     }
     
     func testCloseTicketWithNotes() {
@@ -141,5 +151,127 @@ final class PhaseATests: XCTestCase {
         
         XCTAssertEqual(phaseATickets.count, 1, "Only one ticket should have resetPassword action in Phase A")
         XCTAssertEqual(phaseATickets.first?.id, "INC-7001", "That ticket should be INC-7001")
+    }
+    
+    func testEmptyFieldRenderingForMissingManager() {
+        let userWithNoManager = User(
+            id: "U-NO-MGR",
+            displayName: "Orphan User",
+            status: "ACTIVE",
+            roleId: "R-EMPLOYEE",
+            managerId: nil,
+            departmentId: "D-IT",
+            groupIds: []
+        )
+        
+        store.users.append(userWithNoManager)
+        
+        let manager = store.user(withId: userWithNoManager.managerId ?? "")
+        XCTAssertNil(manager, "Manager should be nil when managerId is nil")
+        
+        let displayValue = manager?.displayName ?? nil
+        XCTAssertNil(displayValue, "Display value should be nil, which EmptyFieldText renders as em-dash")
+    }
+    
+    func testEmptyFieldRenderingForMissingRole() {
+        let userWithNoRole = User(
+            id: "U-NO-ROLE",
+            displayName: "Roleless User",
+            status: "ACTIVE",
+            roleId: nil,
+            managerId: nil,
+            departmentId: "D-IT",
+            groupIds: []
+        )
+        
+        store.users.append(userWithNoRole)
+        
+        let role = store.role(withId: userWithNoRole.roleId)
+        XCTAssertNil(role, "Role should be nil when roleId is nil")
+        
+        let displayValue = role?.name ?? nil
+        XCTAssertNil(displayValue, "Display value should be nil, which EmptyFieldText renders as em-dash")
+    }
+    
+    func testEmptyFieldRenderingForMissingDepartmentFields() {
+        let brokenDept = Department(
+            id: "D-BROKEN",
+            name: "Broken Department",
+            headId: nil,
+            managerId: nil,
+            costCentre: nil,
+            memberIds: [],
+            policyIds: []
+        )
+        
+        store.departments.append(brokenDept)
+        
+        let dept = store.department(withId: "D-BROKEN")
+        XCTAssertNotNil(dept, "Department should exist")
+        XCTAssertNil(dept?.headId, "Head should be nil")
+        XCTAssertNil(dept?.managerId, "Manager should be nil")
+        XCTAssertNil(dept?.costCentre, "Cost centre should be nil")
+        
+        let head = store.user(withId: dept?.headId ?? "")
+        XCTAssertNil(head, "Head user lookup should return nil")
+        
+        let manager = store.user(withId: dept?.managerId ?? "")
+        XCTAssertNil(manager, "Manager user lookup should return nil")
+    }
+    
+    func testEmptyFieldRenderingForNonExistentUser() {
+        let user = store.user(withId: "U-DOES-NOT-EXIST")
+        XCTAssertNil(user, "Non-existent user should return nil")
+        
+        let displayValue = user?.displayName ?? nil
+        XCTAssertNil(displayValue, "Display value should be nil, which EmptyFieldText renders as em-dash")
+    }
+    
+    func testEmptyFieldRenderingForNonExistentDepartment() {
+        let dept = store.department(withId: "D-DOES-NOT-EXIST")
+        XCTAssertNil(dept, "Non-existent department should return nil")
+    }
+    
+    func testSector7EmptyFieldsPhaseF() {
+        store.currentPhaseIndex = 5
+        store.advanceToNextPhase()
+        
+        let sector7User = store.user(withId: "X-USER-417")
+        XCTAssertNotNil(sector7User, "Sector 7 user should exist in Phase F")
+        XCTAssertNil(sector7User?.roleId, "Sector 7 user should have nil roleId")
+        XCTAssertNil(sector7User?.managerId, "Sector 7 user should have nil managerId")
+        
+        let sector7Dept = store.department(withId: "D-SECTOR7")
+        XCTAssertNotNil(sector7Dept, "Sector 7 department should exist")
+        XCTAssertNil(sector7Dept?.headId, "Sector 7 dept should have nil headId")
+        XCTAssertNil(sector7Dept?.managerId, "Sector 7 dept should have nil managerId")
+        XCTAssertNil(sector7Dept?.costCentre, "Sector 7 dept should have nil costCentre")
+        
+        let role = store.role(withId: sector7User?.roleId)
+        XCTAssertNil(role, "Sector 7 role lookup should return nil")
+        
+        let manager = store.user(withId: sector7User?.managerId ?? "")
+        XCTAssertNil(manager, "Sector 7 manager lookup should return nil")
+        
+        let head = store.user(withId: sector7Dept?.headId ?? "")
+        XCTAssertNil(head, "Sector 7 dept head lookup should return nil")
+    }
+    
+    func testEntitlementEmptyFieldRenderingInheritedNoParent() {
+        store.currentPhaseIndex = 5
+        store.advanceToNextPhase()
+        
+        let sector7Ent = store.entitlements.first { $0.id == "E-S7-ORPHAN" }
+        XCTAssertNotNil(sector7Ent, "Sector 7 entitlement should exist")
+        XCTAssertEqual(sector7Ent?.sourceType, "Inherited", "Source type should be Inherited")
+        XCTAssertNil(sector7Ent?.sourceLabel, "Source label should be nil for orphaned inherited entitlement")
+        XCTAssertNil(sector7Ent?.sourceId, "Source ID should be nil")
+        XCTAssertNil(sector7Ent?.policyId, "Policy ID should be nil")
+        
+        let sourceDisplayValue = sector7Ent?.sourceLabel ?? nil
+        XCTAssertNil(sourceDisplayValue, "Source label nil should render as em-dash")
+        
+        let policy = store.policy(withId: sector7Ent?.policyId)
+        XCTAssertNil(policy, "Policy lookup should return nil")
     }
 }
