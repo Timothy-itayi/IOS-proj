@@ -39,36 +39,15 @@ class ScenarioStore: ObservableObject {
     func loadScenario(from bundle: Bundle? = nil) {
         let targetBundle = bundle ?? Bundle.main
         
-        // Debug: List all resources in the bundle
-        if let resourcePath = targetBundle.resourcePath {
-            let resourceURL = URL(fileURLWithPath: resourcePath)
-            if let contents = try? FileManager.default.contentsOfDirectory(at: resourceURL, includingPropertiesForKeys: nil) {
-                print("📦 Bundle resources (\(targetBundle.bundleIdentifier ?? "unknown")): \(contents.map { $0.lastPathComponent })")
-            }
-        }
-        
         guard let url = targetBundle.url(forResource: "demo-vertical-slice", withExtension: "json") else {
-            print("✗ Failed to find demo-vertical-slice.json in bundle: \(targetBundle.bundleIdentifier ?? "unknown")")
-            print("  Bundle path: \(targetBundle.bundlePath)")
-            print("  Resource path: \(targetBundle.resourcePath ?? "nil")")
             return
         }
         
-        print("✓ Found scenario at: \(url.path)")
-        
-        guard let data = try? Data(contentsOf: url) else {
-            print("✗ Failed to load data from \(url.path)")
+        guard let data = try? Data(contentsOf: url),
+              let decoded = try? JSONDecoder().decode(ScenarioData.self, from: data) else {
             return
         }
         
-        print("✓ Loaded \(data.count) bytes")
-        
-        guard let decoded = try? JSONDecoder().decode(ScenarioData.self, from: data) else {
-            print("✗ Failed to decode scenario JSON")
-            return
-        }
-        
-        print("✓ Scenario decoded successfully")
         scenario = decoded
         loadBaselineData()
         advanceToNextPhase()
