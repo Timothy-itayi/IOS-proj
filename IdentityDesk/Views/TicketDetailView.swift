@@ -92,7 +92,6 @@ struct TicketDetailView: View {
                         Text("View User Profile →")
                             .font(.system(size: 12, design: .monospaced))
                             .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
-                            .underline()
                     }
                 }
             }
