@@ -21,8 +21,14 @@ final class PhaseATests: XCTestCase {
     }
     
     func testScenarioLoads() {
-        XCTAssertNotNil(store.scenario, "Scenario should load from demo-vertical-slice.json")
+        XCTAssertNotNil(store.scenario, "Scenario should load from demo-vertical-slice.json. Check console for DecodingError if nil.")
         XCTAssertEqual(store.operatorName, "Daniel", "Operator should be Daniel")
+        
+        // Verify phases loaded
+        if let scenario = store.scenario {
+            XCTAssertGreaterThan(scenario.phases.count, 0, "Scenario should have phases")
+            XCTAssertGreaterThan(scenario.sharedBaseline.users.count, 0, "Baseline should have users")
+        }
     }
     
     func testPhaseATicketExists() {

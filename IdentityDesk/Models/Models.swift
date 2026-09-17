@@ -103,7 +103,7 @@ struct ScenarioPhase: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         objective = try container.decode(String.self, forKey: .objective)
-        teaches = try container.decode([String].self, forKey: .teaches)
+        teaches = try container.decodeIfPresent([String].self, forKey: .teaches) ?? []
         dependsOn = try container.decodeIfPresent([String].self, forKey: .dependsOn)
         seed = try container.decodeIfPresent(PhaseSeed.self, forKey: .seed)
         availableActions = try container.decodeIfPresent([String: [String]].self, forKey: .availableActions) ?? [:]
