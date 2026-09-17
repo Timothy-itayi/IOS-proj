@@ -31,14 +31,14 @@ struct UserProfileView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(user.displayName)
                 .font(.system(size: 18, weight: .bold, design: .monospaced))
-                .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
             
             HStack {
                 FieldLabel(text: "ID")
                 Spacer()
                 Text(user.id)
                     .font(.system(size: 13, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
             }
             
             HStack {
@@ -47,7 +47,7 @@ struct UserProfileView: View {
                 Text(user.status)
                     .font(.system(size: 13, weight: .bold, design: .monospaced))
                     .foregroundColor(user.status == "ACTIVE" ?
-                        Color(red: 0.85, green: 0.82, blue: 0.75) :
+                        Color(red: 0.15, green: 0.15, blue: 0.15) :
                         Color(red: 1.0, green: 0.7, blue: 0.0))
             }
         }
@@ -62,7 +62,7 @@ struct UserProfileView: View {
             HStack {
                 Text("Role")
                     .font(.system(size: 12, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                 Spacer()
                 EmptyFieldText(value: store.role(withId: user.roleId)?.name)
                     .font(.system(size: 13, design: .monospaced))
@@ -71,7 +71,7 @@ struct UserProfileView: View {
             HStack {
                 Text("Manager")
                     .font(.system(size: 12, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                 Spacer()
                 EmptyFieldText(value: store.user(withId: user.managerId ?? "")?.displayName)
                     .font(.system(size: 13, design: .monospaced))
@@ -80,7 +80,7 @@ struct UserProfileView: View {
             HStack {
                 Text("Department")
                     .font(.system(size: 12, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                 Spacer()
                 if let dept = store.department(withId: user.departmentId) {
                     Button(action: {
@@ -88,7 +88,8 @@ struct UserProfileView: View {
                     }) {
                         Text(dept.name)
                             .font(.system(size: 13, design: .monospaced))
-                            .foregroundColor(Color(red: 1.0, green: 0.7, blue: 0.0))
+                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
+                            .underline()
                     }
                 } else {
                     EmptyFieldText(value: nil)
@@ -99,7 +100,7 @@ struct UserProfileView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Groups")
                     .font(.system(size: 12, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                 
                 if user.groupIds.isEmpty {
                     EmptyFieldText(value: nil)
@@ -109,7 +110,7 @@ struct UserProfileView: View {
                         if let group = store.group(withId: groupId) {
                             Text("• \(group.name)")
                                 .font(.system(size: 13, design: .monospaced))
-                                .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                         }
                     }
                 }
@@ -127,7 +128,8 @@ struct UserProfileView: View {
                 Spacer()
                 Text("→")
             }
-            .foregroundColor(Color(red: 1.0, green: 0.7, blue: 0.0))
+            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
+            .underline()
             .padding()
             .panelStyle()
         }

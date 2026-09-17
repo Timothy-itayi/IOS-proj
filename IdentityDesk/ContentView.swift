@@ -98,7 +98,7 @@ struct EmptyFieldText: View {
     
     var body: some View {
         Text(value ?? "—")
-            .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
     }
 }
 
@@ -108,14 +108,14 @@ struct FieldLabel: View {
     var body: some View {
         Text(text)
             .font(.system(size: 11, weight: .semibold, design: .monospaced))
-            .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.6))
+            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
     }
 }
 
 struct PanelBackground: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .background(Color(red: 0.2, green: 0.2, blue: 0.2))
+            .background(Color(red: 0.90, green: 0.88, blue: 0.84))
             .cornerRadius(4)
     }
 }

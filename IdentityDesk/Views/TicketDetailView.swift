@@ -47,7 +47,7 @@ struct TicketDetailView: View {
                 Spacer()
                 Text(ticket.status)
                     .font(.system(size: 13, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
             }
             
             HStack {
@@ -57,7 +57,7 @@ struct TicketDetailView: View {
                     .font(.system(size: 13, design: .monospaced))
                     .foregroundColor(ticket.priority == "High" ?
                         Color(red: 1.0, green: 0.7, blue: 0.0) :
-                        Color(red: 0.85, green: 0.82, blue: 0.75))
+                        Color(red: 0.15, green: 0.15, blue: 0.15))
             }
             
             HStack {
@@ -65,7 +65,7 @@ struct TicketDetailView: View {
                 Spacer()
                 Text(ticket.openedAt)
                     .font(.system(size: 13, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
             }
         }
         .padding()
@@ -80,18 +80,19 @@ struct TicketDetailView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(requester.displayName)
                         .font(.system(size: 14, weight: .medium, design: .monospaced))
-                        .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                     
                     Text("Status: \(requester.status)")
                         .font(.system(size: 12, design: .monospaced))
-                        .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.6))
                     
                     Button(action: {
                         store.selectedUserId = requester.id
                     }) {
                         Text("View User Profile →")
                             .font(.system(size: 12, design: .monospaced))
-                            .foregroundColor(Color(red: 1.0, green: 0.7, blue: 0.0))
+                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
+                            .underline()
                     }
                 }
             }
@@ -105,7 +106,7 @@ struct TicketDetailView: View {
             FieldLabel(text: "DESCRIPTION")
             Text(ticket.description)
                 .font(.system(size: 13, design: .monospaced))
-                .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
         }
         .padding()
         .panelStyle()
@@ -114,6 +115,7 @@ struct TicketDetailView: View {
     private var notesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             FieldLabel(text: "NOTES")
+<<<<<<< HEAD
             
             if #available(iOS 16.0, *) {
                 TextEditor(text: $notes)
@@ -131,6 +133,15 @@ struct TicketDetailView: View {
                     .background(Color(red: 0.15, green: 0.15, blue: 0.15))
                     .cornerRadius(4)
             }
+=======
+            TextEditor(text: $notes)
+                .font(.system(size: 13, design: .monospaced))
+                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                .frame(height: 80)
+                .scrollContentBackground(.hidden)
+                .background(Color(red: 0.95, green: 0.94, blue: 0.92))
+                .cornerRadius(4)
+>>>>>>> ec112e4 (Apply visual polish: bone panels, amber selection rail, member counts)
         }
         .padding()
         .panelStyle()

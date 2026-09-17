@@ -28,10 +28,14 @@ struct TicketRowView: View {
     @ObservedObject var store: ScenarioStore
     @State private var showingDetail = false
     
+    var isSelected: Bool {
+        store.selectedTicketId == ticket.id
+    }
+    
     var priorityColor: Color {
         ticket.priority == "High" ?
             Color(red: 1.0, green: 0.7, blue: 0.0) :
-            Color(red: 0.85, green: 0.82, blue: 0.75)
+            Color(red: 0.15, green: 0.15, blue: 0.15)
     }
     
     var body: some View {
@@ -39,35 +43,43 @@ struct TicketRowView: View {
             store.selectedTicketId = ticket.id
             showingDetail = true
         }) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text(ticket.id)
-                        .font(.system(size: 12, weight: .bold, design: .monospaced))
-                        .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
-                    
-                    Text(ticket.priority.uppercased())
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundColor(priorityColor)
-                    
-                    Spacer()
-                    
-                    Text(ticket.openedAt)
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.5))
+            HStack(spacing: 0) {
+                if isSelected {
+                    Rectangle()
+                        .fill(Color(red: 1.0, green: 0.7, blue: 0.0))
+                        .frame(width: 4)
                 }
                 
-                Text(ticket.subject)
-                    .font(.system(size: 14, weight: .medium, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                if let requester = store.user(withId: ticket.requesterId) {
-                    Text("Requester: \(requester.displayName)")
-                        .font(.system(size: 12, design: .monospaced))
-                        .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(ticket.id)
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.6))
+                        
+                        Text(ticket.priority.uppercased())
+                            .font(.system(size: 10, weight: .bold, design: .monospaced))
+                            .foregroundColor(priorityColor)
+                        
+                        Spacer()
+                        
+                        Text(ticket.openedAt)
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.4))
+                    }
+                    
+                    Text(ticket.subject)
+                        .font(.system(size: 14, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    if let requester = store.user(withId: ticket.requesterId) {
+                        Text("Requester: \(requester.displayName)")
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.6))
+                    }
                 }
+                .padding()
             }
-            .padding()
             .frame(maxWidth: .infinity)
             .panelStyle()
         }
