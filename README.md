@@ -150,7 +150,47 @@ To modify the scenario:
 - Rebuild the app (Xcode automatically bundles the updated JSON)
 - No code changes required for most puzzle adjustments
 
+## Running Tests
+
+The project includes **15 XCTest unit tests** for Phase A (Sarah's password reset flow).
+
+### In Xcode
+
+1. Open `IdentityDesk.xcodeproj`
+2. Press **⌘U** to run all tests, or
+3. Open Test Navigator (**⌘6**) and click the play button next to `IdentityDeskTests`
+
+**Expected result:** All 15 tests pass ✅
+
+### From Command Line
+
+```bash
+xcodebuild test \
+  -project IdentityDesk.xcodeproj \
+  -scheme IdentityDesk \
+  -destination 'platform=iOS Simulator,name=iPhone 14 Pro'
+```
+
+### Test Coverage (Phase A Only)
+
+- **Scenario loading**: JSON parses correctly, operator name set
+- **Ticket data**: INC-7001 exists with correct subject, requester, priority, status
+- **User data**: Sarah Chen record present with correct org hierarchy
+- **Objective**: Phase A objective text is correct
+- **Action gating**: Only `resetPassword` and `close` available for INC-7001
+- **State updates**: `resetPassword` and `closeTicket` modify store correctly
+- **Phase progression**: Completing Phase A advances to Phase B with flags set
+- **Org hierarchy**: Department, role, and manager lookups work
+- **Action exclusivity**: Only Phase A ticket has `resetPassword` initially
+
+Tests use `@MainActor` for ScenarioStore compatibility and include async setup for loading.
+
 ## Troubleshooting
+
+### Tests failing
+- Ensure `demo-vertical-slice.json` is included in the **IdentityDeskTests** target
+- Check Test Navigator (⌘6) for specific test failures
+- Verify scenario JSON is valid (check for parse errors in test output)
 
 ### Simulator won't launch
 - Ensure you've selected an iPhone 11+ simulator target
