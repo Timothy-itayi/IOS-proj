@@ -76,7 +76,7 @@ struct AccessView: View {
         HStack {
             Text("Access for \(user.displayName)")
                 .font(.system(size: 14, weight: .medium, design: .monospaced))
-                .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
             Spacer()
         }
         .padding()
