@@ -79,8 +79,8 @@
 				A10000000 /* IdentityDeskApp.swift */,
 				A10000002 /* ContentView.swift */,
 				A1000000E /* Models */,
-				A1000000D /* Stores */,
-				A1000000C /* Views */,
+				A10000041 /* Stores */,
+				A10000040 /* Views */,
 				A10000035 /* Resources */,
 				A10000004 /* Assets.xcassets */,
 			);
@@ -113,7 +113,7 @@
 			path = IdentityDeskTests;
 			sourceTree = "<group>";
 		};
-		A1000000C /* Views */ = {
+		A10000040 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				A10000013 /* TicketQueueView.swift */,
@@ -128,7 +128,7 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		A1000000D /* Stores */ = {
+		A10000041 /* Stores */ = {
 			isa = PBXGroup;
 			children = (
 				A10000011 /* ScenarioStore.swift */,
