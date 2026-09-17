@@ -125,11 +125,11 @@ struct UserProfileView: View {
             HStack {
                 Text("View Authentication History")
                     .font(.system(size: 13, design: .monospaced))
+                    .underline()
                 Spacer()
                 Text("→")
             }
             .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
-            .underline()
             .padding()
             .panelStyle()
         }
