@@ -37,26 +37,50 @@ class ScenarioStore: ObservableObject {
     }
     
     func loadScenario() {
-        let bundles = [
-            Bundle.main,
-            Bundle(for: type(of: self))
+        var bundles: [Bundle] = [
+            Bundle.main
         ]
+        
+        // Try to get the bundle containing this class
+        bundles.append(Bundle(for: ScenarioStore.self))
+        
+        // For test contexts, also try to get bundles by identifier
+        if let appBundle = Bundle(identifier: "com.example.IdentityDesk") {
+            bundles.append(appBundle)
+        }
+        if let testBundle = Bundle(identifier: "com.example.IdentityDeskTests") {
+            bundles.append(testBundle)
+        }
+        
+        // Try all loaded bundles as a last resort
+        bundles.append(contentsOf: Bundle.allBundles)
         
         var url: URL?
         for bundle in bundles {
             if let foundUrl = bundle.url(forResource: "demo-vertical-slice", withExtension: "json") {
                 url = foundUrl
+                print("✓ Found scenario at: \(foundUrl.path)")
                 break
             }
         }
         
-        guard let url = url,
-              let data = try? Data(contentsOf: url),
-              let decoded = try? JSONDecoder().decode(ScenarioData.self, from: data) else {
-            print("Failed to load scenario")
+        guard let url = url else {
+            print("✗ Failed to find demo-vertical-slice.json in any bundle")
+            print("  Searched \(bundles.count) bundles")
             return
         }
         
+        guard let data = try? Data(contentsOf: url) else {
+            print("✗ Failed to load data from \(url.path)")
+            return
+        }
+        
+        guard let decoded = try? JSONDecoder().decode(ScenarioData.self, from: data) else {
+            print("✗ Failed to decode scenario JSON")
+            return
+        }
+        
+        print("✓ Scenario loaded successfully")
         scenario = decoded
         loadBaselineData()
         advanceToNextPhase()
