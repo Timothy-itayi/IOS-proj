@@ -89,6 +89,7 @@ struct TicketDetailView: View {
                     Button(action: {
                         store.selectedUserId = requester.id
                         store.selectedWindow = .user
+                        isPresented = false
                     }) {
                         Text("View User Profile →")
                             .font(.system(size: 12, design: .monospaced))
