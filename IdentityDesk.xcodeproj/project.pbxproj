@@ -21,7 +21,19 @@
 		A10000020 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001F /* MessageView.swift */; };
 		A10000022 /* PolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000021 /* PolicyView.swift */; };
 		A10000024 /* demo-vertical-slice.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000023 /* demo-vertical-slice.json */; };
+		A10000026 /* IdentityDeskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000025 /* IdentityDeskTests.swift */; };
+		A10000028 /* demo-vertical-slice.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000023 /* demo-vertical-slice.json */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A10000027 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A0FFFFFA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A0FFFFFE;
+			remoteInfo = IdentityDesk;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A0FFFFFFF /* IdentityDesk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IdentityDesk.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -39,10 +51,19 @@
 		A1000001F /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		A10000021 /* PolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolicyView.swift; sourceTree = "<group>"; };
 		A10000023 /* demo-vertical-slice.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "demo-vertical-slice.json"; sourceTree = "<group>"; };
+		A10000025 /* IdentityDeskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityDeskTests.swift; sourceTree = "<group>"; };
+		A10000029 /* IdentityDeskTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IdentityDeskTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A0FFFFFFE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1000002A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -70,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				A0FFFFFFF /* IdentityDesk.app */,
+				A10000029 /* IdentityDeskTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -78,8 +100,17 @@
 			isa = PBXGroup;
 			children = (
 				A0FFFFFD /* IdentityDesk */,
+				A1000002B /* IdentityDeskTests */,
 				A0FFFFFC /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		A1000002B /* IdentityDeskTests */ = {
+			isa = PBXGroup;
+			children = (
+				A10000025 /* IdentityDeskTests.swift */,
+			);
+			path = IdentityDeskTests;
 			sourceTree = "<group>";
 		};
 		A1000000C /* Views */ = {
@@ -141,6 +172,24 @@
 			productReference = A0FFFFFFF /* IdentityDesk.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A1000002C /* IdentityDeskTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1000002D /* Build configuration list for PBXNativeTarget "IdentityDeskTests" */;
+			buildPhases = (
+				A1000002E /* Sources */,
+				A1000002A /* Frameworks */,
+				A1000002F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A10000030 /* PBXTargetDependency */,
+			);
+			name = IdentityDeskTests;
+			productName = IdentityDeskTests;
+			productReference = A10000029 /* IdentityDeskTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -170,9 +219,18 @@
 			projectRoot = "";
 			targets = (
 				A0FFFFFE /* IdentityDesk */,
+				A1000002C /* IdentityDeskTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXTargetDependency section */
+		A10000030 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A0FFFFFE /* IdentityDesk */;
+			targetProxy = A10000027 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXResourcesBuildPhase section */
 		A0FFFFFF /* Resources */ = {
@@ -181,6 +239,14 @@
 			files = (
 				A10000005 /* Assets.xcassets in Resources */,
 				A10000024 /* demo-vertical-slice.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1000002F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000028 /* demo-vertical-slice.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +269,14 @@
 				A1000001E /* AccessView.swift in Sources */,
 				A10000020 /* MessageView.swift in Sources */,
 				A10000022 /* PolicyView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1000002E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000026 /* IdentityDeskTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,6 +458,42 @@
 			};
 			name = Release;
 		};
+		A10000031 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.identitydesk.IdentityDeskTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IdentityDesk.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IdentityDesk";
+			};
+			name = Debug;
+		};
+		A10000032 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.identitydesk.IdentityDeskTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IdentityDesk.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IdentityDesk";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -401,6 +511,15 @@
 			buildConfigurations = (
 				A1000000C /* Debug */,
 				A1000000D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1000002D /* Build configuration list for PBXNativeTarget "IdentityDeskTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000031 /* Debug */,
+				A10000032 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
