@@ -105,6 +105,18 @@ struct UserProfileView: View {
                 }
             }
             
+            if store.chromeRevision == "postMaintenance" {
+                HStack {
+                    Text("Relationship")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
+                    Spacer()
+                    Text("Direct")
+                        .font(.system(size: 13, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                }
+            }
+            
             VStack(alignment: .leading, spacing: 4) {
                 Text("Groups")
                     .font(.system(size: 12, design: .monospaced))

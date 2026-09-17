@@ -21,6 +21,7 @@
 		A10000020 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001F /* MessageView.swift */; };
 		A10000022 /* PolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000021 /* PolicyView.swift */; };
 		A10000024 /* demo-vertical-slice.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000023 /* demo-vertical-slice.json */; };
+		A10000043 /* CorrelationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000042 /* CorrelationView.swift */; };
 		A10000026 /* IdentityDeskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000025 /* IdentityDeskTests.swift */; };
 		A10000028 /* demo-vertical-slice.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000023 /* demo-vertical-slice.json */; };
 /* End PBXBuildFile section */
@@ -51,6 +52,7 @@
 		A1000001F /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		A10000021 /* PolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PolicyView.swift; sourceTree = "<group>"; };
 		A10000023 /* demo-vertical-slice.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "demo-vertical-slice.json"; sourceTree = "<group>"; };
+		A10000042 /* CorrelationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrelationView.swift; sourceTree = "<group>"; };
 		A10000025 /* IdentityDeskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityDeskTests.swift; sourceTree = "<group>"; };
 		A10000029 /* IdentityDeskTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IdentityDeskTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -124,6 +126,7 @@
 				A1000001D /* AccessView.swift */,
 				A1000001F /* MessageView.swift */,
 				A10000021 /* PolicyView.swift */,
+				A10000042 /* CorrelationView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -269,6 +272,7 @@
 				A1000001E /* AccessView.swift in Sources */,
 				A10000020 /* MessageView.swift in Sources */,
 				A10000022 /* PolicyView.swift in Sources */,
+				A10000043 /* CorrelationView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

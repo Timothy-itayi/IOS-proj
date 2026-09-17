@@ -86,6 +86,14 @@ struct Document: Codable, Identifiable, Equatable {
     let createdAt: String
 }
 
+struct Correlation: Identifiable, Equatable {
+    let id: String
+    let ticketId: String?
+    let userId: String?
+    let departmentId: String?
+    let description: String
+}
+
 struct ScenarioPhase: Codable {
     let id: String
     let objective: String
@@ -166,6 +174,7 @@ enum Window: String, CaseIterable {
     case user = "User"
     case dept = "Dept"
     case access = "Access"
+    case correlation = "Correlation"
     case msg = "Msg"
 }
 
