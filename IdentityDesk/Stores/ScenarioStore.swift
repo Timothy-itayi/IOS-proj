@@ -37,7 +37,20 @@ class ScenarioStore: ObservableObject {
     }
     
     func loadScenario() {
-        guard let url = Bundle.main.url(forResource: "demo-vertical-slice", withExtension: "json"),
+        let bundles = [
+            Bundle.main,
+            Bundle(for: type(of: self))
+        ]
+        
+        var url: URL?
+        for bundle in bundles {
+            if let foundUrl = bundle.url(forResource: "demo-vertical-slice", withExtension: "json") {
+                url = foundUrl
+                break
+            }
+        }
+        
+        guard let url = url,
               let data = try? Data(contentsOf: url),
               let decoded = try? JSONDecoder().decode(ScenarioData.self, from: data) else {
             print("Failed to load scenario")
