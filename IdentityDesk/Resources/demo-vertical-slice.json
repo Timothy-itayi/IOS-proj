@@ -1,0 +1,426 @@
+{
+  "id": "demo-vertical-slice",
+  "title": "Sector 7 — Opening Demo",
+  "operator": { "id": "U-DANIEL", "displayName": "Daniel" },
+  "phases": [
+    {
+      "id": "A_sarah_password_reset",
+      "objective": "Help Sarah reset her password",
+      "teaches": ["ticket selection", "user lookup", "identity verification", "password reset", "ticket notes", "ticket closure"],
+      "seed": {
+        "users": [
+          {
+            "id": "U-SARAH",
+            "displayName": "Sarah Chen",
+            "status": "ACTIVE",
+            "roleId": "R-EMPLOYEE",
+            "managerId": "U-MARTIN",
+            "departmentId": "D-OPS",
+            "groupIds": ["G-OPS"]
+          }
+        ],
+        "tickets": [
+          {
+            "id": "INC-7001",
+            "subject": "Password isn't working again.",
+            "requesterId": "U-SARAH",
+            "departmentId": "D-OPS",
+            "priority": "Normal",
+            "status": "Open",
+            "openedAt": "T+0m",
+            "description": "Can't log in this morning."
+          }
+        ]
+      },
+      "availableActions": { "INC-7001": ["resetPassword", "close"] },
+      "completion": { "ticketClosed": "INC-7001", "flags": ["learned_password_reset"] }
+    },
+    {
+      "id": "B_account_unlock",
+      "objective": "Unlock a locked user account",
+      "teaches": ["account status", "failed logins", "auth history", "lockout reason", "unlock", "timestamps"],
+      "dependsOn": ["learned_password_reset"],
+      "seed": {
+        "users": [
+          {
+            "id": "U-JAMES",
+            "displayName": "James Okonkwo",
+            "status": "LOCKED",
+            "roleId": "R-EMPLOYEE",
+            "managerId": "U-MARTIN",
+            "departmentId": "D-ENG",
+            "groupIds": ["G-ENG"]
+          }
+        ],
+        "authEvents": [
+          { "id": "AE-1", "userId": "U-JAMES", "timestamp": "T+12m", "result": "fail", "reason": "Invalid password" },
+          { "id": "AE-2", "userId": "U-JAMES", "timestamp": "T+13m", "result": "fail", "reason": "Invalid password" },
+          { "id": "AE-3", "userId": "U-JAMES", "timestamp": "T+14m", "result": "fail", "reason": "Invalid password" },
+          { "id": "AE-4", "userId": "U-JAMES", "timestamp": "T+14m", "result": "lockout", "reason": "Too many failed attempts" }
+        ],
+        "tickets": [
+          {
+            "id": "INC-7002",
+            "subject": "Account locked",
+            "requesterId": "U-JAMES",
+            "departmentId": "D-ENG",
+            "priority": "High",
+            "status": "Open",
+            "openedAt": "T+15m",
+            "description": "Keeps saying locked out."
+          }
+        ]
+      },
+      "availableActions": { "INC-7002": ["unlockAccount", "close"] },
+      "completion": { "userStatus": { "U-JAMES": "ACTIVE" }, "ticketClosed": "INC-7002", "flags": ["learned_auth_logs"] }
+    },
+    {
+      "id": "C_rd_governance",
+      "objective": "Complete R&D department leadership change",
+      "teaches": ["departments", "managers", "ownership", "roles", "policy", "approval chains", "inherited access"],
+      "dependsOn": ["learned_auth_logs"],
+      "seed": {
+        "departments": [
+          {
+            "id": "D-RD",
+            "name": "R&D",
+            "headId": "U-RD-OUTGOING",
+            "managerId": "U-RD-OUTGOING",
+            "costCentre": "CC-4400",
+            "memberIds": ["U-RD-OUTGOING", "U-RD-INTERIM", "U-ENG-SE"],
+            "policyIds": ["P-DEPT-OWNERSHIP", "P-ACCESS-TRANSFER"]
+          }
+        ],
+        "users": [
+          {
+            "id": "U-RD-OUTGOING",
+            "displayName": "Priya Nair",
+            "status": "DISABLED",
+            "roleId": "R-DEPT-HEAD",
+            "managerId": null,
+            "departmentId": "D-RD",
+            "groupIds": ["G-RD-HEAD"]
+          },
+          {
+            "id": "U-RD-INTERIM",
+            "displayName": "Chris Alvarez",
+            "status": "ACTIVE",
+            "roleId": "R-MANAGER",
+            "managerId": "U-MARTIN",
+            "departmentId": "D-RD",
+            "groupIds": ["G-RD"]
+          }
+        ],
+        "tickets": [
+          {
+            "id": "INC-7003",
+            "subject": "R&D head left — assign interim",
+            "requesterId": "U-MARTIN",
+            "departmentId": "D-RD",
+            "priority": "High",
+            "status": "Open",
+            "openedAt": "T+40m",
+            "description": "Remove Priya Nair approval authority. Assign Chris Alvarez as interim head. Flag access that needs separate approval."
+          }
+        ]
+      },
+      "availableActions": { "INC-7003": ["assignEntitlement", "close"] },
+      "requiredMutations": [
+        { "department": "D-RD", "set": { "headId": "U-RD-INTERIM", "managerId": "U-RD-INTERIM" } },
+        { "removeApprovalAuthority": "U-RD-OUTGOING" },
+        { "flagInheritedAccess": true }
+      ],
+      "completion": { "ticketClosed": "INC-7003", "flags": ["learned_valid_department"] },
+      "baselineRule": "A valid department always has Head, Manager, Cost Centre, Members, Policies"
+    },
+    {
+      "id": "D_design_access",
+      "objective": "Restore designer access to shared resource",
+      "teaches": ["groups", "entitlements", "access inheritance", "role-based access", "Access Source"],
+      "dependsOn": ["learned_valid_department"],
+      "seed": {
+        "users": [
+          {
+            "id": "U-DESIGNER",
+            "displayName": "Maya Brooks",
+            "status": "ACTIVE",
+            "roleId": "R-DESIGNER",
+            "managerId": "U-DESIGN-MGR",
+            "departmentId": "D-DESIGN",
+            "groupIds": ["G-DESIGN"]
+          }
+        ],
+        "departments": [
+          {
+            "id": "D-DESIGN",
+            "name": "Design",
+            "headId": "U-DESIGN-MGR",
+            "managerId": "U-DESIGN-MGR",
+            "costCentre": "CC-2200",
+            "memberIds": ["U-DESIGN-MGR", "U-DESIGNER"],
+            "policyIds": ["P-DESIGN-ASSETS"]
+          }
+        ],
+        "entitlements": [
+          {
+            "id": "E-DESIGN-SHARE",
+            "name": "Design Shared Drive",
+            "sourceType": "Group",
+            "sourceLabel": "G-DESIGN",
+            "sourceId": "G-DESIGN",
+            "policyId": "P-DESIGN-ASSETS",
+            "status": "REVOKED",
+            "userId": "U-DESIGNER"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "INC-7004",
+            "subject": "Lost access to design share",
+            "requesterId": "U-DESIGNER",
+            "departmentId": "D-DESIGN",
+            "priority": "Normal",
+            "status": "Open",
+            "openedAt": "T+70m",
+            "description": "Can't open the shared drive anymore."
+          }
+        ]
+      },
+      "availableActions": { "INC-7004": ["assignEntitlement", "close"] },
+      "completion": {
+        "entitlementStatus": { "E-DESIGN-SHARE": "ACTIVE" },
+        "ticketClosed": "INC-7004",
+        "flags": ["learned_access_source"]
+      },
+      "baselineRule": "Every entitlement names Access Source: Role | Group | Inherited"
+    },
+    {
+      "id": "E_maintenance",
+      "objective": "Survive scheduled platform maintenance",
+      "teaches": ["believable update", "subtle UI capability expansion"],
+      "dependsOn": ["learned_access_source"],
+      "events": [
+        {
+          "type": "announcement",
+          "text": "Scheduled Identity & Governance Platform Maintenance 14:00–14:15. Some account and access-management functionality may be temporarily unavailable."
+        },
+        {
+          "type": "message",
+          "from": "U-MARTIN",
+          "body": "Daniel — please keep an eye on your open ticket SLA while the platform is down. Thanks."
+        },
+        { "type": "ui_refresh", "visualDelta": "post-maintenance", "feel": "cleaner, slightly more capable, not ominous" }
+      ],
+      "completion": { "flags": ["post_maintenance"] }
+    },
+    {
+      "id": "F_sector7",
+      "objective": "Investigate INC-7314 (Sector 7)",
+      "teaches": ["anomaly via missing baseline fields"],
+      "dependsOn": ["post_maintenance"],
+      "seed": {
+        "users": [
+          {
+            "id": "X-USER-417",
+            "displayName": "X-USER-417",
+            "status": "ACTIVE",
+            "roleId": null,
+            "managerId": null,
+            "departmentId": "D-SECTOR7",
+            "groupIds": []
+          }
+        ],
+        "departments": [
+          {
+            "id": "D-SECTOR7",
+            "name": "SECTOR 7",
+            "headId": null,
+            "managerId": null,
+            "costCentre": null,
+            "memberIds": ["X-USER-417"],
+            "policyIds": []
+          }
+        ],
+        "entitlements": [
+          {
+            "id": "E-S7-ORPHAN",
+            "name": "Sector 7 Access",
+            "sourceType": "Inherited",
+            "sourceLabel": null,
+            "sourceId": null,
+            "policyId": null,
+            "status": "ACTIVE",
+            "userId": "X-USER-417"
+          }
+        ],
+        "tickets": [
+          {
+            "id": "INC-7314",
+            "subject": "This is not working.",
+            "requesterId": "X-USER-417",
+            "departmentId": "D-SECTOR7",
+            "priority": "Normal",
+            "status": "Open",
+            "openedAt": "T+95m",
+            "description": "This is not working."
+          }
+        ],
+        "documents": [
+          {
+            "id": "DOC-S7-LEGACY",
+            "title": "Compliance archive fragment",
+            "body": "…reference to Sector 7 appears in a retired cost-centre note. No active register entry.",
+            "tags": ["Sector 7", "archive"],
+            "createdAt": "Y-3"
+          }
+        ]
+      },
+      "anomalies": [
+        { "check": 1, "object": "User", "looks": "normal ACTIVE" },
+        { "check": 2, "object": "Department", "issue": "SECTOR 7 not in official register; Head/Manager/Cost Centre/Policies render as —" },
+        { "check": 3, "object": "Manager", "issue": "managerId null — conflicts with governance baseline" },
+        { "check": 4, "object": "Entitlement", "issue": "Inherited with no parent source" },
+        { "check": 5, "object": "Document", "issue": "legacy breadcrumb only — do not explain fully" }
+      ],
+      "availableActions": { "INC-7314": [] },
+      "completion": { "flags": ["investigated_sector7", "found_s7_breadcrumb"] },
+      "renderRules": {
+        "emptyField": "—",
+        "neverHideRows": true,
+        "departmentAlwaysShow": ["Head", "Manager", "Cost Centre", "Members", "Policies"]
+      }
+    },
+    {
+      "id": "G_fake_martin",
+      "objective": "Confirm Martin Hale's identity; do not reveal Sector 7 knowledge",
+      "dependsOn": ["investigated_sector7"],
+      "characters": {
+        "realMartin": {
+          "id": "U-MARTIN",
+          "displayName": "Martin Hale",
+          "traits": ["formal", "no emojis", "ends with Thanks.", "metrics-obsessed", "corporate phrasing"]
+        }
+      },
+      "seed": {
+        "messages": [
+          {
+            "id": "M-EARLY-1",
+            "fromUserId": "U-MARTIN",
+            "toUserId": "U-DANIEL",
+            "body": "Please update me on your open tickets before EOD. Thanks.",
+            "sentAt": "T+20m",
+            "hasEmoji": false
+          },
+          {
+            "id": "M-EARLY-2",
+            "fromUserId": "U-MARTIN",
+            "toUserId": "U-DANIEL",
+            "body": "SLA on High priority items needs to stay under 2 hours. Thanks.",
+            "sentAt": "T+55m",
+            "hasEmoji": false
+          },
+          {
+            "id": "M-FAKE-1",
+            "fromUserId": "U-MARTIN",
+            "toUserId": "U-DANIEL",
+            "body": "Come to Meeting Room 3 when you're done 👍",
+            "sentAt": "T+110m",
+            "hasEmoji": true,
+            "isImpostor": true
+          }
+        ]
+      },
+      "objectiveTransitions": [
+        { "when": "phase_start", "objective": "Discuss INC-7314 with Martin Hale." },
+        { "when": "emoji_anomaly_noticed", "objective": "Confirm Martin Hale's identity." },
+        { "when": "further_contradiction", "objective": "Do not reveal what you know about Sector 7." }
+      ],
+      "tells": ["emoji", "unusual phrase", "wrong sign-off", "missed metric concern", "name Daniel never uses"],
+      "completion": { "flags": ["confirmed_impostor"], "demoEnd": true },
+      "doNotReveal": ["who is extracting", "whether office is real", "why Sector 7 matters", "what Daniel knows"]
+    }
+  ],
+  "sharedBaseline": {
+    "users": [
+      {
+        "id": "U-DANIEL",
+        "displayName": "Daniel",
+        "status": "ACTIVE",
+        "roleId": "R-IT-TECH",
+        "managerId": "U-MARTIN",
+        "departmentId": "D-IT",
+        "groupIds": ["G-IT"]
+      },
+      {
+        "id": "U-MARTIN",
+        "displayName": "Martin Hale",
+        "status": "ACTIVE",
+        "roleId": "R-MANAGER",
+        "managerId": null,
+        "departmentId": "D-IT",
+        "groupIds": ["G-IT-MGMT"]
+      }
+    ],
+    "departments": [
+      {
+        "id": "D-IT",
+        "name": "IT Support",
+        "headId": "U-MARTIN",
+        "managerId": "U-MARTIN",
+        "costCentre": "CC-1100",
+        "memberIds": ["U-MARTIN", "U-DANIEL"],
+        "policyIds": ["P-IT-OPS"]
+      },
+      {
+        "id": "D-OPS",
+        "name": "Operations",
+        "headId": "U-OPS-HEAD",
+        "managerId": "U-OPS-HEAD",
+        "costCentre": "CC-3300",
+        "memberIds": ["U-OPS-HEAD", "U-SARAH"],
+        "policyIds": ["P-OPS"]
+      },
+      {
+        "id": "D-ENG",
+        "name": "Engineering",
+        "headId": "U-ENG-HEAD",
+        "managerId": "U-ENG-HEAD",
+        "costCentre": "CC-4100",
+        "memberIds": ["U-ENG-HEAD", "U-JAMES", "U-ENG-SE"],
+        "policyIds": ["P-ENG"]
+      }
+    ],
+    "roles": [
+      { "id": "R-IT-TECH", "name": "IT Technician" },
+      { "id": "R-MANAGER", "name": "Manager" },
+      { "id": "R-EMPLOYEE", "name": "Employee" },
+      { "id": "R-DEPT-HEAD", "name": "Department Head" },
+      { "id": "R-DESIGNER", "name": "Designer" }
+    ],
+    "groups": [
+      { "id": "G-IT", "name": "IT Support" },
+      { "id": "G-IT-MGMT", "name": "IT Management" },
+      { "id": "G-OPS", "name": "Operations" },
+      { "id": "G-ENG", "name": "Engineering" },
+      { "id": "G-RD", "name": "R&D" },
+      { "id": "G-RD-HEAD", "name": "R&D Heads" },
+      { "id": "G-DESIGN", "name": "Design" }
+    ],
+    "policies": [
+      { "id": "P-IT-OPS", "name": "IT Operations Policy", "rules": ["Verify identity before reset", "Log all unlocks"], "appliesTo": "D-IT" },
+      { "id": "P-OPS", "name": "Operations Access Policy", "rules": ["Manager approval for privileged groups"], "appliesTo": "D-OPS" },
+      { "id": "P-ENG", "name": "Engineering Access Policy", "rules": ["Lockout after 3 failures"], "appliesTo": "D-ENG" },
+      { "id": "P-DEPT-OWNERSHIP", "name": "Department Ownership", "rules": ["Every department has a Head and Manager", "Cost centre required"], "appliesTo": "org" },
+      { "id": "P-ACCESS-TRANSFER", "name": "Access Transfer", "rules": ["Inherited access must name a source", "Flag transfers needing separate approval"], "appliesTo": "org" },
+      { "id": "P-DESIGN-ASSETS", "name": "Design Asset Access", "rules": ["Design share via G-DESIGN only"], "appliesTo": "D-DESIGN" }
+    ]
+  },
+  "successCriteria": [
+    "Player understands workplace systems",
+    "Sector 7 should not exist",
+    "Something changed after maintenance",
+    "Martin behaved differently",
+    "Someone wants Sector 7 information",
+    "Want to know more — without full explanation"
+  ]
+}
