@@ -8,7 +8,8 @@ final class PhaseATests: XCTestCase {
     
     override func setUp() async throws {
         store = ScenarioStore()
-        store.loadScenario()
+        // Explicitly try to load from test bundle first, then fall back to default search
+        store.loadScenario(from: Bundle(for: type(of: self)))
         
         try await Task.sleep(nanoseconds: 100_000_000)
     }

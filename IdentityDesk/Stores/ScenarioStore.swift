@@ -36,27 +36,24 @@ class ScenarioStore: ObservableObject {
         currentPhase?.objective ?? ""
     }
     
-    func loadScenario() {
-        var bundles: [Bundle] = [
-            Bundle.main
-        ]
-        
-        // Try to get the bundle containing this class
-        bundles.append(Bundle(for: ScenarioStore.self))
-        
-        // For test contexts, also try to get bundles by identifier
-        if let appBundle = Bundle(identifier: "com.example.IdentityDesk") {
-            bundles.append(appBundle)
+    func loadScenario(from bundle: Bundle? = nil) {
+        let searchBundles: [Bundle]
+        if let bundle = bundle {
+            searchBundles = [bundle]
+        } else {
+            var bundles: [Bundle] = [Bundle.main, Bundle(for: ScenarioStore.self)]
+            if let appBundle = Bundle(identifier: "com.example.IdentityDesk") {
+                bundles.append(appBundle)
+            }
+            if let testBundle = Bundle(identifier: "com.example.IdentityDeskTests") {
+                bundles.append(testBundle)
+            }
+            bundles.append(contentsOf: Bundle.allBundles)
+            searchBundles = bundles
         }
-        if let testBundle = Bundle(identifier: "com.example.IdentityDeskTests") {
-            bundles.append(testBundle)
-        }
-        
-        // Try all loaded bundles as a last resort
-        bundles.append(contentsOf: Bundle.allBundles)
         
         var url: URL?
-        for bundle in bundles {
+        for bundle in searchBundles {
             if let foundUrl = bundle.url(forResource: "demo-vertical-slice", withExtension: "json") {
                 url = foundUrl
                 print("✓ Found scenario at: \(foundUrl.path)")
@@ -66,7 +63,7 @@ class ScenarioStore: ObservableObject {
         
         guard let url = url else {
             print("✗ Failed to find demo-vertical-slice.json in any bundle")
-            print("  Searched \(bundles.count) bundles")
+            print("  Searched \(searchBundles.count) bundles")
             return
         }
         
@@ -84,6 +81,10 @@ class ScenarioStore: ObservableObject {
         scenario = decoded
         loadBaselineData()
         advanceToNextPhase()
+    }
+    
+    func loadScenario() {
+        loadScenario(from: nil)
     }
     
     private func loadBaselineData() {
