@@ -114,13 +114,23 @@ struct TicketDetailView: View {
     private var notesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             FieldLabel(text: "NOTES")
-            TextEditor(text: $notes)
-                .font(.system(size: 13, design: .monospaced))
-                .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
-                .frame(height: 80)
-                .scrollContentBackground(.hidden)
-                .background(Color(red: 0.15, green: 0.15, blue: 0.15))
-                .cornerRadius(4)
+            
+            if #available(iOS 16.0, *) {
+                TextEditor(text: $notes)
+                    .font(.system(size: 13, design: .monospaced))
+                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                    .frame(height: 80)
+                    .scrollContentBackground(.hidden)
+                    .background(Color(red: 0.15, green: 0.15, blue: 0.15))
+                    .cornerRadius(4)
+            } else {
+                TextEditor(text: $notes)
+                    .font(.system(size: 13, design: .monospaced))
+                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                    .frame(height: 80)
+                    .background(Color(red: 0.15, green: 0.15, blue: 0.15))
+                    .cornerRadius(4)
+            }
         }
         .padding()
         .panelStyle()
