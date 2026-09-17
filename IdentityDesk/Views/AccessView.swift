@@ -91,11 +91,11 @@ struct EntitlementRow: View {
     private var statusColor: Color {
         switch entitlement.status {
         case "ACTIVE":
-            return Color(red: 0.85, green: 0.82, blue: 0.75)
+            return Color(red: 0.15, green: 0.15, blue: 0.15)
         case "REVOKED":
             return Color(red: 1.0, green: 0.3, blue: 0.0)
         default:
-            return Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.5)
+            return Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5)
         }
     }
     
@@ -104,7 +104,7 @@ struct EntitlementRow: View {
             HStack {
                 Text(entitlement.name)
                     .font(.system(size: 14, weight: .medium, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                 Spacer()
                 Text(entitlement.status)
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
@@ -114,16 +114,16 @@ struct EntitlementRow: View {
             HStack {
                 Text("Access Source")
                     .font(.system(size: 11, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.6))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                 Spacer()
                 HStack(spacing: 4) {
                     Text(entitlement.sourceType)
                         .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                     
                     Text("|")
                         .font(.system(size: 12, design: .monospaced))
-                        .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.5))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                     
                     EmptyFieldText(value: entitlement.sourceLabel)
                         .font(.system(size: 12, design: .monospaced))
@@ -136,19 +136,19 @@ struct EntitlementRow: View {
                 }) {
                     HStack {
                         Text("Policy: \(policy.name)")
-                            .font(.system(size: 12, design: .monospaced))
-                            .foregroundColor(Color(red: 1.0, green: 0.7, blue: 0.0))
+                            .font(.system(size: 12, weight: .medium, design: .monospaced))
+                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
                         Spacer()
                         Text("→")
                             .font(.system(size: 12, design: .monospaced))
-                            .foregroundColor(Color(red: 1.0, green: 0.7, blue: 0.0))
+                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
                     }
                 }
             } else {
                 HStack {
                     Text("Policy")
                         .font(.system(size: 11, design: .monospaced))
-                        .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.6))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                     Spacer()
                     EmptyFieldText(value: nil)
                         .font(.system(size: 12, design: .monospaced))
