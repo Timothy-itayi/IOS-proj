@@ -8,8 +8,24 @@ final class PhaseATests: XCTestCase {
     
     override func setUp() async throws {
         store = ScenarioStore()
-        // Explicitly try to load from test bundle first, then fall back to default search
-        store.loadScenario(from: Bundle(for: type(of: self)))
+        
+        // For tests, explicitly pass the test bundle where the JSON resource is copied
+        let testBundle = Bundle(for: type(of: self))
+        print("Test bundle: \(testBundle.bundleIdentifier ?? "unknown"), path: \(testBundle.bundlePath)")
+        
+        // List resources in test bundle for debugging
+        if let resourcePath = testBundle.resourcePath {
+            let resourceURL = URL(fileURLWithPath: resourcePath)
+            if let contents = try? FileManager.default.contentsOfDirectory(at: resourceURL, includingPropertiesForKeys: nil) {
+                print("Test bundle resources: \(contents.map { $0.lastPathComponent })")
+            }
+        }
+        
+        store.loadScenario(from: testBundle)
+        
+        if store.scenario == nil {
+            print("⚠️ WARNING: Scenario failed to load in setUp")
+        }
         
         try await Task.sleep(nanoseconds: 100_000_000)
     }

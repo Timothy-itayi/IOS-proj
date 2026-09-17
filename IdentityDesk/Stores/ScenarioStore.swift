@@ -37,47 +37,38 @@ class ScenarioStore: ObservableObject {
     }
     
     func loadScenario(from bundle: Bundle? = nil) {
-        let searchBundles: [Bundle]
-        if let bundle = bundle {
-            searchBundles = [bundle]
-        } else {
-            var bundles: [Bundle] = [Bundle.main, Bundle(for: ScenarioStore.self)]
-            if let appBundle = Bundle(identifier: "com.example.IdentityDesk") {
-                bundles.append(appBundle)
-            }
-            if let testBundle = Bundle(identifier: "com.example.IdentityDeskTests") {
-                bundles.append(testBundle)
-            }
-            bundles.append(contentsOf: Bundle.allBundles)
-            searchBundles = bundles
-        }
+        let targetBundle = bundle ?? Bundle.main
         
-        var url: URL?
-        for bundle in searchBundles {
-            if let foundUrl = bundle.url(forResource: "demo-vertical-slice", withExtension: "json") {
-                url = foundUrl
-                print("✓ Found scenario at: \(foundUrl.path)")
-                break
+        // Debug: List all resources in the bundle
+        if let resourcePath = targetBundle.resourcePath {
+            let resourceURL = URL(fileURLWithPath: resourcePath)
+            if let contents = try? FileManager.default.contentsOfDirectory(at: resourceURL, includingPropertiesForKeys: nil) {
+                print("📦 Bundle resources (\(targetBundle.bundleIdentifier ?? "unknown")): \(contents.map { $0.lastPathComponent })")
             }
         }
         
-        guard let url = url else {
-            print("✗ Failed to find demo-vertical-slice.json in any bundle")
-            print("  Searched \(searchBundles.count) bundles")
+        guard let url = targetBundle.url(forResource: "demo-vertical-slice", withExtension: "json") else {
+            print("✗ Failed to find demo-vertical-slice.json in bundle: \(targetBundle.bundleIdentifier ?? "unknown")")
+            print("  Bundle path: \(targetBundle.bundlePath)")
+            print("  Resource path: \(targetBundle.resourcePath ?? "nil")")
             return
         }
+        
+        print("✓ Found scenario at: \(url.path)")
         
         guard let data = try? Data(contentsOf: url) else {
             print("✗ Failed to load data from \(url.path)")
             return
         }
         
+        print("✓ Loaded \(data.count) bytes")
+        
         guard let decoded = try? JSONDecoder().decode(ScenarioData.self, from: data) else {
             print("✗ Failed to decode scenario JSON")
             return
         }
         
-        print("✓ Scenario loaded successfully")
+        print("✓ Scenario decoded successfully")
         scenario = decoded
         loadBaselineData()
         advanceToNextPhase()
