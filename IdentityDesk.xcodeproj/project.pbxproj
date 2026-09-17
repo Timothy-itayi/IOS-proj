@@ -81,7 +81,7 @@
 				A1000000E /* Models */,
 				A1000000D /* Stores */,
 				A1000000C /* Views */,
-				A10000022 /* Resources */,
+				A10000035 /* Resources */,
 				A10000004 /* Assets.xcassets */,
 			);
 			path = IdentityDesk;
@@ -96,7 +96,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A0FFFFFB = {
+		A10000034 = {
 			isa = PBXGroup;
 			children = (
 				A0FFFFFD /* IdentityDesk */,
@@ -144,7 +144,7 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		A10000022 /* Resources */ = {
+		A10000035 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
 				A10000023 /* demo-vertical-slice.json */,
@@ -159,7 +159,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A1000000B /* Build configuration list for PBXNativeTarget "IdentityDesk" */;
 			buildPhases = (
-				A0FFFFFA /* Sources */,
+				A10000033 /* Sources */,
 				A0FFFFFFE /* Frameworks */,
 				A0FFFFFF /* Resources */,
 			);
@@ -213,7 +213,7 @@
 				en,
 				Base,
 			);
-			mainGroup = A0FFFFFB;
+			mainGroup = A10000034;
 			productRefGroup = A0FFFFFC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -253,7 +253,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A0FFFFFA /* Sources */ = {
+		A10000033 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
