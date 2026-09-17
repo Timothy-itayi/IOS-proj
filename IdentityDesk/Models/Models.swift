@@ -94,6 +94,21 @@ struct ScenarioPhase: Codable {
     let seed: PhaseSeed?
     let availableActions: [String: [String]]
     let completion: PhaseCompletion
+    
+    enum CodingKeys: String, CodingKey {
+        case id, objective, teaches, dependsOn, seed, availableActions, completion
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        objective = try container.decode(String.self, forKey: .objective)
+        teaches = try container.decode([String].self, forKey: .teaches)
+        dependsOn = try container.decodeIfPresent([String].self, forKey: .dependsOn)
+        seed = try container.decodeIfPresent(PhaseSeed.self, forKey: .seed)
+        availableActions = try container.decodeIfPresent([String: [String]].self, forKey: .availableActions) ?? [:]
+        completion = try container.decode(PhaseCompletion.self, forKey: .completion)
+    }
 }
 
 struct PhaseSeed: Codable {
@@ -111,6 +126,18 @@ struct PhaseCompletion: Codable {
     let userStatus: [String: String]?
     let entitlementStatus: [String: String]?
     let flags: [String]
+    
+    enum CodingKeys: String, CodingKey {
+        case ticketClosed, userStatus, entitlementStatus, flags
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        ticketClosed = try container.decodeIfPresent(String.self, forKey: .ticketClosed)
+        userStatus = try container.decodeIfPresent([String: String].self, forKey: .userStatus)
+        entitlementStatus = try container.decodeIfPresent([String: String].self, forKey: .entitlementStatus)
+        flags = try container.decodeIfPresent([String].self, forKey: .flags) ?? []
+    }
 }
 
 struct ScenarioData: Codable {

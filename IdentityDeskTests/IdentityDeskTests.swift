@@ -9,13 +9,9 @@ final class PhaseATests: XCTestCase {
     override func setUp() async throws {
         store = ScenarioStore()
         
-        // For app-hosted unit tests, try Bundle.main first (where app resources are)
-        // Then fall back to test bundle if needed
-        if Bundle.main.url(forResource: "demo-vertical-slice", withExtension: "json") != nil {
-            store.loadScenario(from: Bundle.main)
-        } else {
-            store.loadScenario(from: Bundle(for: type(of: self)))
-        }
+        // For unit tests, load from test bundle where JSON resource is copied
+        let testBundle = Bundle(for: type(of: self))
+        store.loadScenario(from: testBundle)
         
         try await Task.sleep(nanoseconds: 100_000_000)
     }
