@@ -59,9 +59,18 @@ struct ContentView: View {
         }
     }
     
+    private var availableWindows: [Window] {
+        Window.allCases.filter { window in
+            if window == .correlation {
+                return store.chromeRevision == "postMaintenance"
+            }
+            return true
+        }
+    }
+    
     private var windowSwitcher: some View {
         HStack(spacing: 0) {
-            ForEach(Window.allCases, id: \.self) { window in
+            ForEach(availableWindows, id: \.self) { window in
                 Button(action: {
                     store.selectedWindow = window
                 }) {
