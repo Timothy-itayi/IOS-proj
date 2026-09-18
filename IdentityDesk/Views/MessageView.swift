@@ -81,22 +81,7 @@ struct ReplyChipStrip: View {
                 .font(.system(size: 11, weight: .semibold, design: .monospaced))
                 .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
             
-            FlowLayout(spacing: 8) {
-                ForEach(chips) { chip in
-                    Button(action: {
-                        store.selectReplyChip(chip)
-                    }) {
-                        Text(chip.text)
-                            .font(.system(size: 12, design: .monospaced))
-                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color(red: 0.90, green: 0.88, blue: 0.84))
-                            .cornerRadius(3)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                }
-            }
+            ChipWrapView(chips: chips, store: store)
         }
         .padding()
         .background(Color(red: 0.90, green: 0.88, blue: 0.84).opacity(0.3))
@@ -104,55 +89,81 @@ struct ReplyChipStrip: View {
     }
 }
 
-struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
+struct ChipWrapView: View {
+    let chips: [ReplyChip]
+    @ObservedObject var store: ScenarioStore
     
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = FlowResult(
-            in: proposal.replacingUnspecifiedDimensions().width,
-            subviews: subviews,
-            spacing: spacing
-        )
-        return result.size
-    }
-    
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = FlowResult(
-            in: bounds.width,
-            subviews: subviews,
-            spacing: spacing
-        )
-        for (index, subview) in subviews.enumerated() {
-            subview.place(at: CGPoint(x: bounds.minX + result.positions[index].x, y: bounds.minY + result.positions[index].y), proposal: .unspecified)
+    var body: some View {
+        GeometryReader { geometry in
+            self.generateContent(in: geometry)
         }
+        .frame(height: calculateHeight())
     }
     
-    struct FlowResult {
-        var size: CGSize = .zero
-        var positions: [CGPoint] = []
+    private func generateContent(in geometry: GeometryProxy) -> some View {
+        var width: CGFloat = 0
+        var height: CGFloat = 0
+        var lastHeight: CGFloat = 0
         
-        init(in maxWidth: CGFloat, subviews: Subviews, spacing: CGFloat) {
-            var currentX: CGFloat = 0
-            var currentY: CGFloat = 0
-            var lineHeight: CGFloat = 0
-            var maxX: CGFloat = 0
-            
-            for subview in subviews {
-                let size = subview.sizeThatFits(.unspecified)
-                
-                if currentX + size.width > maxWidth && currentX > 0 {
-                    currentX = 0
-                    currentY += lineHeight + spacing
-                    lineHeight = 0
-                }
-                
-                positions.append(CGPoint(x: currentX, y: currentY))
-                currentX += size.width + spacing
-                lineHeight = max(lineHeight, size.height)
-                maxX = max(maxX, currentX - spacing)
+        return ZStack(alignment: .topLeading) {
+            ForEach(Array(chips.enumerated()), id: \.element.id) { index, chip in
+                ChipButton(chip: chip, store: store)
+                    .padding(.trailing, 8)
+                    .padding(.bottom, 8)
+                    .alignmentGuide(.leading, computeValue: { dimension in
+                        if abs(width - dimension.width) > geometry.size.width {
+                            width = 0
+                            height -= lastHeight
+                        }
+                        lastHeight = dimension.height
+                        let result = width
+                        if chips.indices.contains(index + 1) {
+                            width -= dimension.width + 8
+                        } else {
+                            width = 0
+                        }
+                        return result
+                    })
+                    .alignmentGuide(.top, computeValue: { dimension in
+                        let result = height
+                        if chips.indices.contains(index + 1) {
+                            lastHeight = dimension.height
+                        } else {
+                            height = 0
+                        }
+                        return result
+                    })
             }
-            
-            size = CGSize(width: maxX, height: currentY + lineHeight)
         }
+    }
+    
+    private func calculateHeight() -> CGFloat {
+        var height: CGFloat = 44
+        let chipCount = chips.count
+        if chipCount > 0 {
+            let estimatedRows = max(1, chipCount / 2)
+            height = CGFloat(estimatedRows) * 44
+        }
+        return height
+    }
+}
+
+struct ChipButton: View {
+    let chip: ReplyChip
+    @ObservedObject var store: ScenarioStore
+    
+    var body: some View {
+        Button(action: {
+            store.selectReplyChip(chip)
+        }) {
+            Text(chip.text)
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color(red: 0.90, green: 0.88, blue: 0.84))
+                .cornerRadius(3)
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 }
