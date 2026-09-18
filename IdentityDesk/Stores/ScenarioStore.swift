@@ -438,7 +438,8 @@ class ScenarioStore: ObservableObject {
             "R-NOTHING": ("Cool, just want a quick sync", nil),
             "R-NORMAL": ("Ah right, no rush then", nil),
             "R-BRIEF": ("Sounds good 👍", nil),
-            "R-SPECULATE": ("Fair enough, see you in a bit", nil)
+            "R-SPECULATE": ("Fair enough, see you in a bit", nil),
+            "R-SECTOR7": ("Not sure what that's about. Let's chat in person.", nil)
         ]
         
         if let (body, flag) = responses[responseId] {

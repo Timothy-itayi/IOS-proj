@@ -410,6 +410,13 @@
             "setId": "C",
             "triggersFlag": "confirmed_impostor",
             "triggersResponse": "R-SPECULATE"
+          },
+          {
+            "id": "CHIP-C5",
+            "text": "About Sector 7…",
+            "setId": "C",
+            "isRisky": true,
+            "triggersResponse": "R-SECTOR7"
           }
         ]
       },
