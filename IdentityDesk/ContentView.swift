@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var store = ScenarioStore()
     @State private var showResetConfirmation = false
+    @State private var showDemoCompleteSheet = false
     
     var body: some View {
         ZStack {
@@ -21,12 +22,23 @@ struct ContentView: View {
                 store.loadScenario()
             }
         }
+        .onChange(of: store.showDemoComplete) { newValue in
+            if newValue {
+                showDemoCompleteSheet = true
+            }
+        }
         .sheet(isPresented: $showResetConfirmation) {
             ResetConfirmationView(
                 isPresented: $showResetConfirmation,
                 onConfirm: {
                     store.resetProgress()
                 }
+            )
+        }
+        .sheet(isPresented: $showDemoCompleteSheet) {
+            DemoCompleteView(
+                isPresented: $showDemoCompleteSheet,
+                store: store
             )
         }
     }
@@ -219,5 +231,75 @@ struct ResetConfirmationView: View {
             .padding(.bottom, 20)
         }
         .background(Color(red: 0.90, green: 0.88, blue: 0.84))
+    }
+}
+
+struct DemoCompleteView: View {
+    @Binding var isPresented: Bool
+    @ObservedObject var store: ScenarioStore
+    @State private var showResetConfirmation = false
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("SESSION COMPLETE")
+                    .font(.system(size: 17, weight: .semibold, design: .monospaced))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                
+                Text("Operator log closed. Identity Desk vertical slice finished.")
+                    .font(.system(size: 14, design: .monospaced))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
+                
+                Text("Tip build · A→G")
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.55))
+            }
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            HStack(spacing: 12) {
+                Button(action: {
+                    showResetConfirmation = true
+                }) {
+                    Text("RESET DEMO")
+                        .font(.system(size: 14, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .background(Color(red: 0.90, green: 0.88, blue: 0.84))
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), lineWidth: 1)
+                        )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Button(action: {
+                    isPresented = false
+                    store.showDemoComplete = false
+                    store.selectedWindow = .tickets
+                }) {
+                    Text("DONE")
+                        .font(.system(size: 14, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color(red: 0.96, green: 0.94, blue: 0.90))
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .background(Color(red: 0.15, green: 0.15, blue: 0.15))
+                        .cornerRadius(8)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
+        }
+        .background(Color(red: 0.90, green: 0.88, blue: 0.84))
+        .sheet(isPresented: $showResetConfirmation) {
+            ResetConfirmationView(
+                isPresented: $showResetConfirmation,
+                onConfirm: {
+                    store.resetProgress()
+                    isPresented = false
+                }
+            )
+        }
     }
 }

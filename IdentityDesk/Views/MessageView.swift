@@ -15,11 +15,26 @@ struct MessageView: View {
         ScrollView {
             VStack(spacing: 12) {
                 if messages.isEmpty {
-                    Text("No messages")
-                        .font(.system(size: 13, design: .monospaced))
-                        .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.5))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.top, 40)
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("No active threads")
+                                .font(.system(size: 14, weight: .medium, design: .monospaced))
+                                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                            
+                            Text("Inbound operator messages appear here when a case assigns one.")
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.55))
+                                .lineLimit(2)
+                        }
+                        
+                        Text("Status · Queue idle")
+                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .panelStyle()
+                    .padding(.top, 40)
                 } else {
                     ForEach(messages) { message in
                         MessageRow(message: message, store: store)

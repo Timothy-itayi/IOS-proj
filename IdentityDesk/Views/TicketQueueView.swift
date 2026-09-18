@@ -34,8 +34,8 @@ struct TicketRowView: View {
     
     var priorityColor: Color {
         ticket.priority == "High" ?
-            Color(red: 1.0, green: 0.7, blue: 0.0) :
-            Color(red: 0.15, green: 0.15, blue: 0.15)
+            Color(red: 0.72, green: 0.29, blue: 0.23) :
+            Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.55)
     }
     
     var body: some View {
