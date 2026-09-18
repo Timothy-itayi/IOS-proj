@@ -400,4 +400,47 @@ final class PhaseATests: XCTestCase {
         let outboundCount = operatorMessages.filter { $0.fromUserId == operatorId }.count
         XCTAssertGreaterThan(outboundCount, 0, "Should include at least the test outbound message")
     }
+    
+    func testPhaseCEntitlementAssignment() {
+        // Advance to Phase C (depends on learned_auth_logs from Phase B)
+        store.completedFlags.insert("learned_password_reset")
+        store.completedFlags.insert("learned_auth_logs")
+        store.currentPhaseIndex = 2
+        store.advanceToNextPhase()
+        
+        XCTAssertEqual(store.currentPhase?.id, "C_rd_governance", "Should be on Phase C")
+        
+        // Verify INC-7003 exists
+        let ticket = store.tickets.first { $0.id == "INC-7003" }
+        XCTAssertNotNil(ticket, "INC-7003 should exist in Phase C")
+        XCTAssertEqual(ticket?.requesterId, "U-MARTIN", "Requester should be Martin")
+        
+        // Verify entitlement exists and is REVOKED
+        let entitlement = store.entitlements.first { $0.id == "E-RD-HEAD-AUTHORITY" }
+        XCTAssertNotNil(entitlement, "E-RD-HEAD-AUTHORITY should exist")
+        XCTAssertEqual(entitlement?.userId, "U-MARTIN", "Entitlement should be for Martin")
+        XCTAssertEqual(entitlement?.status, "REVOKED", "Entitlement should start as REVOKED")
+        
+        // Verify assignEntitlement action is available
+        let actions = store.availableActions(for: "INC-7003")
+        XCTAssertTrue(actions.contains("assignEntitlement"), "assignEntitlement should be available")
+        XCTAssertTrue(actions.contains("close"), "close should be available")
+        
+        // Test closing without assigning (should NOT advance)
+        let ticketCountBefore = store.tickets.count
+        store.closeTicket("INC-7003", notes: "Attempting to close without assign")
+        XCTAssertEqual(store.currentPhase?.id, "C_rd_governance", "Should still be on Phase C")
+        XCTAssertEqual(store.tickets.count, ticketCountBefore, "Ticket should not be removed if phase doesn't complete")
+        
+        // Assign the entitlement
+        store.assignEntitlement(entitlementId: "E-RD-HEAD-AUTHORITY")
+        let assignedEnt = store.entitlements.first { $0.id == "E-RD-HEAD-AUTHORITY" }
+        XCTAssertEqual(assignedEnt?.status, "ACTIVE", "Entitlement should be ACTIVE after assignment")
+        
+        // Now close the ticket (should advance to Phase D)
+        store.closeTicket("INC-7003", notes: "Completed after assignment")
+        XCTAssertEqual(store.currentPhase?.id, "D_design_access", "Should advance to Phase D after completing Phase C")
+        XCTAssertNil(store.tickets.first { $0.id == "INC-7003" }, "INC-7003 should be removed after successful completion")
+        XCTAssertTrue(store.completedFlags.contains("learned_valid_department"), "Should have learned_valid_department flag")
+    }
 }
