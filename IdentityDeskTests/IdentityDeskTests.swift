@@ -351,6 +351,7 @@ final class PhaseATests: XCTestCase {
         XCTAssertNil(policy, "Policy lookup should return nil")
     }
     
+ cursor/reset-confirm-dialog-af83
     func testResetProgressClearsDataAndRestartsDemo() {
         // Advance to Phase B first
         store.closeTicket("INC-7001", notes: "Resolved")
@@ -372,5 +373,32 @@ final class PhaseATests: XCTestCase {
         XCTAssertEqual(store.currentPhase?.id, "A_sarah_password_reset", "Should be back on Phase A")
         XCTAssertNotNil(store.tickets.first { $0.id == "INC-7001" }, "Phase A ticket should exist again")
         XCTAssertNil(store.tickets.first { $0.id == "INC-7002" }, "Phase B ticket should not exist")
+
+    func testMessagesForOperatorIncludesOutboundReplies() {
+        guard let operatorId = store.scenario?.operator.id else {
+            XCTFail("Operator ID should exist")
+            return
+        }
+        
+        let outboundMessage = Message(
+            id: "M-TEST-OUTBOUND",
+            fromUserId: operatorId,
+            toUserId: "U-MARTIN",
+            body: "Test reply to Martin",
+            sentAt: "T+115m",
+            hasEmoji: false,
+            isImpostor: nil
+        )
+        
+        store.messages.append(outboundMessage)
+        
+        let operatorMessages = store.messagesForOperator()
+        let containsOutbound = operatorMessages.contains { $0.id == "M-TEST-OUTBOUND" }
+        
+        XCTAssertTrue(containsOutbound, "Operator's outbound messages should appear in messagesForOperator()")
+        
+        let outboundCount = operatorMessages.filter { $0.fromUserId == operatorId }.count
+        XCTAssertGreaterThan(outboundCount, 0, "Should include at least the test outbound message")
+ 
     }
 }
