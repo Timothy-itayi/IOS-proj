@@ -195,7 +195,7 @@ struct TicketDetailView: View {
                         successLabel: "PASSWORD RESET"
                     ) {
                         store.resetPassword(userId: ticket.requesterId)
-                        showSuccessStatus(message: "Status updated · User ACTIVE")
+                        setSuccessStatus(message: "Status updated · User ACTIVE")
                     }
                 }
                 
@@ -205,7 +205,7 @@ struct TicketDetailView: View {
                         successLabel: "ACCOUNT UNLOCKED"
                     ) {
                         store.unlockAccount(userId: ticket.requesterId)
-                        showSuccessStatus(message: "Status updated · User ACTIVE")
+                        setSuccessStatus(message: "Status updated · User ACTIVE")
                     }
                 }
                 
@@ -214,7 +214,7 @@ struct TicketDetailView: View {
                         ticket: ticket,
                         store: store,
                         onSuccess: {
-                            showSuccessStatus(message: "Status updated · Entitlement ACTIVE")
+                            setSuccessStatus(message: "Status updated · Entitlement ACTIVE")
                         }
                     )
                 }
@@ -244,7 +244,7 @@ struct TicketDetailView: View {
         .panelStyle()
     }
     
-    private func showSuccessStatus(message: String) {
+    private func setSuccessStatus(message: String) {
         successStatusMessage = message
         withAnimation {
             showSuccessStatus = true
