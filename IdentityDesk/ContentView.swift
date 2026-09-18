@@ -26,8 +26,6 @@ struct ContentView: View {
                     store.resetProgress()
                 }
             )
-            .presentationDetents([.height(200)])
-            .presentationDragIndicator(.hidden)
         }
     }
     
