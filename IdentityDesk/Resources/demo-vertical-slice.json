@@ -292,7 +292,7 @@
     },
     {
       "id": "G_fake_martin",
-      "objective": "Confirm Martin Hale's identity; do not reveal Sector 7 knowledge",
+      "objective": "Discuss INC-7314 with Martin Hale.",
       "dependsOn": ["investigated_sector7"],
       "characters": {
         "realMartin": {
@@ -328,12 +328,104 @@
             "hasEmoji": true,
             "isImpostor": true
           }
+        ],
+        "replyChips": [
+          {
+            "id": "CHIP-A1",
+            "text": "On my way.",
+            "setId": "A",
+            "triggersResponse": "R-ONWAY"
+          },
+          {
+            "id": "CHIP-A2",
+            "text": "Which room again?",
+            "setId": "A",
+            "triggersResponse": "R-ROOM"
+          },
+          {
+            "id": "CHIP-A3",
+            "text": "Can this wait until I close INC-7314?",
+            "setId": "A",
+            "triggersResponse": "R-WAIT"
+          },
+          {
+            "id": "CHIP-A4",
+            "text": "Looking at your earlier messages…",
+            "setId": "A",
+            "triggersFlag": "identity_suspicion",
+            "triggersResponse": "R-EARLIER"
+          },
+          {
+            "id": "CHIP-B1",
+            "text": "You never use emoji — everything alright?",
+            "setId": "B",
+            "triggersFlag": "identity_suspicion",
+            "triggersResponse": "R-EMOJI"
+          },
+          {
+            "id": "CHIP-B2",
+            "text": "Quick SLA check: High still under 2h?",
+            "setId": "B",
+            "triggersFlag": "identity_suspicion",
+            "triggersResponse": "R-SLA"
+          },
+          {
+            "id": "CHIP-B3",
+            "text": "Sign-off with Thanks. like usual?",
+            "setId": "B",
+            "triggersFlag": "identity_suspicion",
+            "triggersResponse": "R-SIGNOFF"
+          },
+          {
+            "id": "CHIP-B4",
+            "text": "Meeting Room 3 — confirm building?",
+            "setId": "B",
+            "triggersFlag": "further_contradiction",
+            "triggersResponse": "R-BUILDING"
+          },
+          {
+            "id": "CHIP-C1",
+            "text": "Nothing unusual on my queue.",
+            "setId": "C",
+            "triggersFlag": "confirmed_impostor",
+            "triggersResponse": "R-NOTHING"
+          },
+          {
+            "id": "CHIP-C2",
+            "text": "Still investigating a Normal ticket.",
+            "setId": "C",
+            "triggersFlag": "confirmed_impostor",
+            "triggersResponse": "R-NORMAL"
+          },
+          {
+            "id": "CHIP-C3",
+            "text": "I'll brief you after the meeting.",
+            "setId": "C",
+            "triggersFlag": "confirmed_impostor",
+            "triggersResponse": "R-BRIEF"
+          },
+          {
+            "id": "CHIP-C4",
+            "text": "I'd rather not speculate.",
+            "setId": "C",
+            "triggersFlag": "confirmed_impostor",
+            "triggersResponse": "R-SPECULATE"
+          }
         ]
       },
       "objectiveTransitions": [
-        { "when": "phase_start", "objective": "Discuss INC-7314 with Martin Hale." },
-        { "when": "emoji_anomaly_noticed", "objective": "Confirm Martin Hale's identity." },
-        { "when": "further_contradiction", "objective": "Do not reveal what you know about Sector 7." }
+        {
+          "flag": "identity_suspicion",
+          "newObjective": "Confirm Martin Hale's identity."
+        },
+        {
+          "flag": "further_contradiction",
+          "newObjective": "Do not reveal what you know about Sector 7."
+        },
+        {
+          "flag": "confirmed_impostor",
+          "newObjective": "Identity not confirmed. Do not disclose."
+        }
       ],
       "tells": ["emoji", "unusual phrase", "wrong sign-off", "missed metric concern", "name Daniel never uses"],
       "completion": { "flags": ["confirmed_impostor"], "demoEnd": true },

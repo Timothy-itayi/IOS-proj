@@ -17,6 +17,8 @@ class ScenarioStore: ObservableObject {
     @Published var roles: [Role] = []
     @Published var groups: [UserGroup] = []
     @Published var policies: [Policy] = []
+    @Published var replyChips: [ReplyChip] = []
+    @Published var customObjective: String?
     
     @Published var selectedTicketId: String?
     @Published var selectedUserId: String?
@@ -35,7 +37,10 @@ class ScenarioStore: ObservableObject {
     }
     
     var currentObjective: String {
-        currentPhase?.objective ?? ""
+        if let custom = customObjective {
+            return custom
+        }
+        return currentPhase?.objective ?? ""
     }
     
     func loadScenario(from bundle: Bundle? = nil) {
@@ -143,6 +148,10 @@ class ScenarioStore: ObservableObject {
         
         if let newDocuments = seed.documents {
             documents.append(contentsOf: newDocuments)
+        }
+        
+        if let newReplyChips = seed.replyChips {
+            replyChips.append(contentsOf: newReplyChips)
         }
     }
     
@@ -265,5 +274,102 @@ class ScenarioStore: ObservableObject {
     func messagesForOperator() -> [Message] {
         guard let operatorId = scenario?.operator.id else { return [] }
         return messages.filter { $0.toUserId == operatorId }.sorted { $0.sentAt < $1.sentAt }
+    }
+    
+    func availableReplyChips() -> [ReplyChip] {
+        var available: [ReplyChip] = []
+        
+        for chip in replyChips {
+            switch chip.setId {
+            case "A":
+                if completedFlags.contains("investigated_sector7") && !completedFlags.contains("identity_suspicion") {
+                    available.append(chip)
+                }
+            case "B":
+                if completedFlags.contains("identity_suspicion") && !completedFlags.contains("further_contradiction") {
+                    available.append(chip)
+                }
+            case "C":
+                if completedFlags.contains("further_contradiction") && !completedFlags.contains("confirmed_impostor") {
+                    available.append(chip)
+                }
+            default:
+                break
+            }
+        }
+        
+        return available
+    }
+    
+    func selectReplyChip(_ chip: ReplyChip) {
+        guard let operatorId = scenario?.operator.id else { return }
+        
+        let playerMessage = Message(
+            id: "M-PLAYER-\(messages.count + 1)",
+            fromUserId: operatorId,
+            toUserId: "U-MARTIN",
+            body: chip.text,
+            sentAt: "T+\(110 + messages.count)m",
+            hasEmoji: false,
+            isImpostor: false,
+            triggersFlag: chip.triggersFlag
+        )
+        messages.append(playerMessage)
+        
+        if let flag = chip.triggersFlag {
+            completedFlags.insert(flag)
+            checkObjectiveTransitions()
+        }
+        
+        if let responseId = chip.triggersResponse {
+            addMartinResponse(responseId: responseId)
+        }
+    }
+    
+    private func addMartinResponse(responseId: String) {
+        let responses: [String: (String, String?)] = [
+            "R-ONWAY": ("👍 See you soon", nil),
+            "R-ROOM": ("Meeting Room 3, ground floor", nil),
+            "R-WAIT": ("No worries, just swing by when you can", nil),
+            "R-EARLIER": ("Yeah, just wanted to confirm the details 😊", "further_contradiction"),
+            "R-EMOJI": ("What do you mean? Everything's fine", "identity_suspicion"),
+            "R-SLA": ("Pretty sure it's still 2h, why?", "identity_suspicion"),
+            "R-SIGNOFF": ("Not sure what you mean... just Thanks?", "identity_suspicion"),
+            "R-BUILDING": ("Main building yeah. You alright?", "further_contradiction"),
+            "R-NOTHING": ("Cool, just want a quick sync", nil),
+            "R-NORMAL": ("Ah right, no rush then", nil),
+            "R-BRIEF": ("Sounds good 👍", nil),
+            "R-SPECULATE": ("Fair enough, see you in a bit", nil)
+        ]
+        
+        if let (body, flag) = responses[responseId] {
+            let martinMessage = Message(
+                id: "M-FAKE-\(messages.count + 1)",
+                fromUserId: "U-MARTIN",
+                toUserId: scenario?.operator.id ?? "U-DANIEL",
+                body: body,
+                sentAt: "T+\(110 + messages.count)m",
+                hasEmoji: body.contains("👍") || body.contains("😊"),
+                isImpostor: true,
+                triggersFlag: flag
+            )
+            messages.append(martinMessage)
+            
+            if let triggerFlag = flag {
+                completedFlags.insert(triggerFlag)
+                checkObjectiveTransitions()
+            }
+        }
+    }
+    
+    private func checkObjectiveTransitions() {
+        guard let phase = currentPhase,
+              let transitions = phase.objectiveTransitions else { return }
+        
+        for transition in transitions {
+            if completedFlags.contains(transition.flag) {
+                customObjective = transition.newObjective
+            }
+        }
     }
 }
