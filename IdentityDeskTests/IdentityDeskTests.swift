@@ -350,4 +350,31 @@ final class PhaseATests: XCTestCase {
         let policy = store.policy(withId: sector7Ent?.policyId)
         XCTAssertNil(policy, "Policy lookup should return nil")
     }
+    
+    func testMessagesForOperatorIncludesOutboundReplies() {
+        guard let operatorId = store.scenario?.operator.id else {
+            XCTFail("Operator ID should exist")
+            return
+        }
+        
+        let outboundMessage = Message(
+            id: "M-TEST-OUTBOUND",
+            fromUserId: operatorId,
+            toUserId: "U-MARTIN",
+            body: "Test reply to Martin",
+            sentAt: "T+115m",
+            hasEmoji: false,
+            isImpostor: nil
+        )
+        
+        store.messages.append(outboundMessage)
+        
+        let operatorMessages = store.messagesForOperator()
+        let containsOutbound = operatorMessages.contains { $0.id == "M-TEST-OUTBOUND" }
+        
+        XCTAssertTrue(containsOutbound, "Operator's outbound messages should appear in messagesForOperator()")
+        
+        let outboundCount = operatorMessages.filter { $0.fromUserId == operatorId }.count
+        XCTAssertGreaterThan(outboundCount, 0, "Should include at least the test outbound message")
+    }
 }
