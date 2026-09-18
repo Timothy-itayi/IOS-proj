@@ -399,6 +399,5 @@ final class PhaseATests: XCTestCase {
         
         let outboundCount = operatorMessages.filter { $0.fromUserId == operatorId }.count
         XCTAssertGreaterThan(outboundCount, 0, "Should include at least the test outbound message")
- 
     }
 }
