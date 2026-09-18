@@ -146,11 +146,7 @@ struct UserProfileView: View {
         }) {
             HStack {
                 Text("View Authentication History")
- cursor/identity-desk-ios-app-714b
-                    .font(.system(size: 13, design: .monospaced))
-
                     .font(.system(size: 13, weight: .medium, design: .monospaced))
- main
                 Spacer()
                 Text("→")
             }

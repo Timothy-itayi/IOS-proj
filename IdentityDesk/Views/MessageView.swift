@@ -48,7 +48,7 @@ struct MessageRow: View {
                         .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                 }
                 Spacer()
-                Text(message.sentAt)
+                Text(TimeFormatter.formatScenarioTime(message.sentAt))
                     .font(.system(size: 11, design: .monospaced))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
             }

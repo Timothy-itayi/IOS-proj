@@ -62,7 +62,7 @@ struct TicketRowView: View {
                         
                         Spacer()
                         
-                        Text(ticket.openedAt)
+                        Text(TimeFormatter.formatScenarioTime(ticket.openedAt))
                             .font(.system(size: 11, design: .monospaced))
                             .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.4))
                     }
