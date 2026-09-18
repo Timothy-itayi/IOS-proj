@@ -111,6 +111,18 @@
             "groupIds": ["G-RD"]
           }
         ],
+        "entitlements": [
+          {
+            "id": "E-RD-HEAD-AUTHORITY",
+            "name": "R&D Head Approval Authority",
+            "sourceType": "Role",
+            "sourceLabel": "R-DEPT-HEAD",
+            "sourceId": "R-DEPT-HEAD",
+            "policyId": "P-DEPT-OWNERSHIP",
+            "status": "REVOKED",
+            "userId": "U-MARTIN"
+          }
+        ],
         "tickets": [
           {
             "id": "INC-7003",
@@ -130,7 +142,11 @@
         { "removeApprovalAuthority": "U-RD-OUTGOING" },
         { "flagInheritedAccess": true }
       ],
-      "completion": { "ticketClosed": "INC-7003", "flags": ["learned_valid_department"] },
+      "completion": {
+        "entitlementStatus": { "E-RD-HEAD-AUTHORITY": "ACTIVE" },
+        "ticketClosed": "INC-7003",
+        "flags": ["learned_valid_department"]
+      },
       "baselineRule": "A valid department always has Head, Manager, Cost Centre, Members, Policies"
     },
     {

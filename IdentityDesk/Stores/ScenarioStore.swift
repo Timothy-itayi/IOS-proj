@@ -331,15 +331,17 @@ class ScenarioStore: ObservableObject {
             var updatedTicket = tickets[index]
             updatedTicket.notes = notes
             tickets[index] = updatedTicket
-            tickets.remove(at: index)
             
-            checkPhaseCompletion(ticketId: ticketId)
+            if checkPhaseCompletion(ticketId: ticketId) {
+                tickets.remove(at: index)
+            }
             saveProgress()
         }
     }
     
-    private func checkPhaseCompletion(ticketId: String) {
-        guard let phase = currentPhase else { return }
+    @discardableResult
+    private func checkPhaseCompletion(ticketId: String) -> Bool {
+        guard let phase = currentPhase else { return false }
         let completion = phase.completion
         
         var completed = false
@@ -385,6 +387,8 @@ class ScenarioStore: ObservableObject {
             advanceToNextPhase()
             saveProgress()
         }
+        
+        return completed
     }
     
     func entitlements(for userId: String, filter: AccessFilter = .all) -> [Entitlement] {
