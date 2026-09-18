@@ -17,7 +17,9 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            store.loadScenario()
+            if !store.restoreProgress() {
+                store.loadScenario()
+            }
         }
         .sheet(isPresented: $showResetConfirmation) {
             ResetConfirmationView(

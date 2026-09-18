@@ -242,6 +242,68 @@ final class PhaseATests: XCTestCase {
         XCTAssertNil(dept, "Non-existent department should return nil")
     }
     
+    func testTimeFormatterNow() {
+        XCTAssertEqual(TimeFormatter.formatScenarioTime("T+0m"), "now", "T+0m should format as 'now'")
+    }
+    
+    func testTimeFormatterMinutes() {
+        XCTAssertEqual(TimeFormatter.formatScenarioTime("T+5m"), "5m ago", "T+5m should format as '5m ago'")
+        XCTAssertEqual(TimeFormatter.formatScenarioTime("T+45m"), "45m ago", "T+45m should format as '45m ago'")
+    }
+    
+    func testTimeFormatterHours() {
+        XCTAssertEqual(TimeFormatter.formatScenarioTime("T+60m"), "1h ago", "T+60m should format as '1h ago'")
+        XCTAssertEqual(TimeFormatter.formatScenarioTime("T+120m"), "2h ago", "T+120m should format as '2h ago'")
+    }
+    
+    func testTimeFormatterHoursAndMinutes() {
+        XCTAssertEqual(TimeFormatter.formatScenarioTime("T+65m"), "1h 5m ago", "T+65m should format as '1h 5m ago'")
+        XCTAssertEqual(TimeFormatter.formatScenarioTime("T+95m"), "1h 35m ago", "T+95m should format as '1h 35m ago'")
+    }
+    
+    func testTimeFormatterPassthrough() {
+        XCTAssertEqual(TimeFormatter.formatScenarioTime("invalid"), "invalid", "Invalid format should pass through unchanged")
+        XCTAssertEqual(TimeFormatter.formatScenarioTime("2024-01-01"), "2024-01-01", "ISO date should pass through unchanged")
+    }
+    
+    func testSaveAndRestoreProgress() {
+        store.currentPhaseIndex = 2
+        store.completedFlags.insert("test_flag")
+        store.chromeRevision = "postMaintenance"
+        
+        store.saveProgress()
+        
+        let newStore = ScenarioStore()
+        newStore.scenario = store.scenario
+        newStore.roles = store.roles
+        newStore.groups = store.groups
+        newStore.policies = store.policies
+        
+        let restored = newStore.restoreProgress()
+        
+        XCTAssertTrue(restored, "Progress should be restored successfully")
+        XCTAssertEqual(newStore.currentPhaseIndex, 2, "Phase index should be restored")
+        XCTAssertTrue(newStore.completedFlags.contains("test_flag"), "Completed flags should be restored")
+        XCTAssertEqual(newStore.chromeRevision, "postMaintenance", "Chrome revision should be restored")
+    }
+    
+    func testResetProgressClearsState() {
+        store.currentPhaseIndex = 3
+        store.completedFlags.insert("some_flag")
+        store.chromeRevision = "postMaintenance"
+        store.saveProgress()
+        
+        store.resetProgress()
+        
+        XCTAssertEqual(store.currentPhaseIndex, 0, "Phase index should reset to 0")
+        XCTAssertTrue(store.completedFlags.isEmpty, "Completed flags should be cleared")
+        XCTAssertEqual(store.chromeRevision, "baseline", "Chrome revision should reset to baseline")
+        
+        let newStore = ScenarioStore()
+        let restored = newStore.restoreProgress()
+        XCTAssertFalse(restored, "Should not restore progress after reset")
+    }
+    
     func testSector7EmptyFieldsPhaseF() {
         // Phase F depends on "post_maintenance" flag from Phase E completion
         store.completedFlags.insert("post_maintenance")

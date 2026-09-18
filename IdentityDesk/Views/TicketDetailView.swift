@@ -63,7 +63,7 @@ struct TicketDetailView: View {
             HStack {
                 FieldLabel(text: "OPENED")
                 Spacer()
-                Text(ticket.openedAt)
+                Text(TimeFormatter.formatScenarioTime(ticket.openedAt))
                     .font(.system(size: 13, design: .monospaced))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
             }

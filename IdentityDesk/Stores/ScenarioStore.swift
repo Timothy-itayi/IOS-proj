@@ -1,5 +1,23 @@
 import Foundation
 
+struct SavedProgress: Codable {
+    let currentPhaseIndex: Int
+    let completedFlags: Set<String>
+    let chromeRevision: String
+    let tickets: [Ticket]
+    let users: [User]
+    let authEvents: [AuthenticationEvent]
+    let departments: [Department]
+    let entitlements: [Entitlement]
+    let messages: [Message]
+    let documents: [Document]
+    let selectedTicketId: String?
+    let selectedUserId: String?
+    let selectedDepartmentId: String?
+    let selectedPolicyId: String?
+    let selectedWindow: String
+}
+
 @MainActor
 class ScenarioStore: ObservableObject {
     @Published var scenario: ScenarioData?
@@ -17,12 +35,16 @@ class ScenarioStore: ObservableObject {
     @Published var roles: [Role] = []
     @Published var groups: [UserGroup] = []
     @Published var policies: [Policy] = []
+    @Published var replyChips: [ReplyChip] = []
+    @Published var customObjective: String?
     
     @Published var selectedTicketId: String?
     @Published var selectedUserId: String?
     @Published var selectedDepartmentId: String?
     @Published var selectedPolicyId: String?
     @Published var selectedWindow: Window = .tickets
+    
+    private let saveKey = "IdentityDesk.SavedProgress"
     
     var operatorName: String {
         scenario?.operator.displayName ?? "Daniel"
@@ -35,7 +57,10 @@ class ScenarioStore: ObservableObject {
     }
     
     var currentObjective: String {
-        currentPhase?.objective ?? ""
+        if let custom = customObjective {
+            return custom
+        }
+        return currentPhase?.objective ?? ""
     }
     
     func loadScenario(from bundle: Bundle? = nil) {
@@ -66,6 +91,80 @@ class ScenarioStore: ObservableObject {
     
     func loadScenario() {
         loadScenario(from: nil)
+    }
+    
+    func saveProgress() {
+        let progress = SavedProgress(
+            currentPhaseIndex: currentPhaseIndex,
+            completedFlags: completedFlags,
+            chromeRevision: chromeRevision,
+            tickets: tickets,
+            users: users,
+            authEvents: authEvents,
+            departments: departments,
+            entitlements: entitlements,
+            messages: messages,
+            documents: documents,
+            selectedTicketId: selectedTicketId,
+            selectedUserId: selectedUserId,
+            selectedDepartmentId: selectedDepartmentId,
+            selectedPolicyId: selectedPolicyId,
+            selectedWindow: selectedWindow.rawValue
+        )
+        
+        if let encoded = try? JSONEncoder().encode(progress) {
+            UserDefaults.standard.set(encoded, forKey: saveKey)
+        }
+    }
+    
+    func restoreProgress() -> Bool {
+        guard let data = UserDefaults.standard.data(forKey: saveKey),
+              let progress = try? JSONDecoder().decode(SavedProgress.self, from: data) else {
+            return false
+        }
+        
+        currentPhaseIndex = progress.currentPhaseIndex
+        completedFlags = progress.completedFlags
+        chromeRevision = progress.chromeRevision
+        tickets = progress.tickets
+        users = progress.users
+        authEvents = progress.authEvents
+        departments = progress.departments
+        entitlements = progress.entitlements
+        messages = progress.messages
+        documents = progress.documents
+        selectedTicketId = progress.selectedTicketId
+        selectedUserId = progress.selectedUserId
+        selectedDepartmentId = progress.selectedDepartmentId
+        selectedPolicyId = progress.selectedPolicyId
+        if let window = Window(rawValue: progress.selectedWindow) {
+            selectedWindow = window
+        }
+        
+        return true
+    }
+    
+    func resetProgress() {
+        UserDefaults.standard.removeObject(forKey: saveKey)
+        currentPhaseIndex = 0
+        completedFlags = []
+        chromeRevision = "baseline"
+        tickets = []
+        users = []
+        authEvents = []
+        departments = []
+        entitlements = []
+        messages = []
+        documents = []
+        roles = []
+        groups = []
+        policies = []
+        selectedTicketId = nil
+        selectedUserId = nil
+        selectedDepartmentId = nil
+        selectedPolicyId = nil
+        selectedWindow = .tickets
+        loadScenario()
     }
     
     private func loadBaselineData() {
@@ -144,6 +243,10 @@ class ScenarioStore: ObservableObject {
         if let newDocuments = seed.documents {
             documents.append(contentsOf: newDocuments)
         }
+        
+        if let newReplyChips = seed.replyChips {
+            replyChips.append(contentsOf: newReplyChips)
+        }
     }
     
     func user(withId id: String) -> User? {
@@ -175,18 +278,21 @@ class ScenarioStore: ObservableObject {
     func resetPassword(userId: String) {
         if let index = users.firstIndex(where: { $0.id == userId }) {
             users[index].status = "ACTIVE"
+            saveProgress()
         }
     }
     
     func unlockAccount(userId: String) {
         if let index = users.firstIndex(where: { $0.id == userId }) {
             users[index].status = "ACTIVE"
+            saveProgress()
         }
     }
     
     func assignEntitlement(entitlementId: String) {
         if let index = entitlements.firstIndex(where: { $0.id == entitlementId }) {
             entitlements[index].status = "ACTIVE"
+            saveProgress()
         }
     }
     
@@ -198,6 +304,7 @@ class ScenarioStore: ObservableObject {
             tickets.remove(at: index)
             
             checkPhaseCompletion(ticketId: ticketId)
+            saveProgress()
         }
     }
     
@@ -240,6 +347,7 @@ class ScenarioStore: ObservableObject {
             }
             currentPhaseIndex += 1
             advanceToNextPhase()
+            saveProgress()
         }
     }
     
@@ -267,25 +375,100 @@ class ScenarioStore: ObservableObject {
         return messages.filter { $0.toUserId == operatorId }.sorted { $0.sentAt < $1.sentAt }
     }
     
-    func resetProgress() {
-        currentPhaseIndex = 0
-        completedFlags.removeAll()
-        chromeRevision = "baseline"
+    func availableReplyChips() -> [ReplyChip] {
+        var available: [ReplyChip] = []
         
-        tickets.removeAll()
-        users.removeAll()
-        authEvents.removeAll()
-        departments.removeAll()
-        entitlements.removeAll()
-        messages.removeAll()
-        documents.removeAll()
+        for chip in replyChips {
+            switch chip.setId {
+            case "A":
+                if completedFlags.contains("investigated_sector7") && !completedFlags.contains("identity_suspicion") {
+                    available.append(chip)
+                }
+            case "B":
+                if completedFlags.contains("identity_suspicion") && !completedFlags.contains("further_contradiction") {
+                    available.append(chip)
+                }
+            case "C":
+                if completedFlags.contains("further_contradiction") && !completedFlags.contains("confirmed_impostor") {
+                    available.append(chip)
+                }
+            default:
+                break
+            }
+        }
         
-        selectedTicketId = nil
-        selectedUserId = nil
-        selectedDepartmentId = nil
-        selectedPolicyId = nil
-        selectedWindow = .tickets
+        return available
+    }
+    
+    func selectReplyChip(_ chip: ReplyChip) {
+        guard let operatorId = scenario?.operator.id else { return }
         
-        loadScenario()
+        let playerMessage = Message(
+            id: "M-PLAYER-\(messages.count + 1)",
+            fromUserId: operatorId,
+            toUserId: "U-MARTIN",
+            body: chip.text,
+            sentAt: "T+\(110 + messages.count)m",
+            hasEmoji: false,
+            isImpostor: false,
+            triggersFlag: chip.triggersFlag
+        )
+        messages.append(playerMessage)
+        
+        if let flag = chip.triggersFlag {
+            completedFlags.insert(flag)
+            checkObjectiveTransitions()
+        }
+        
+        if let responseId = chip.triggersResponse {
+            addMartinResponse(responseId: responseId)
+        }
+    }
+    
+    private func addMartinResponse(responseId: String) {
+        let responses: [String: (String, String?)] = [
+            "R-ONWAY": ("👍 See you soon", nil),
+            "R-ROOM": ("Meeting Room 3, ground floor", nil),
+            "R-WAIT": ("No worries, just swing by when you can", nil),
+            "R-EARLIER": ("Yeah, just wanted to confirm the details 😊", "further_contradiction"),
+            "R-EMOJI": ("What do you mean? Everything's fine", "identity_suspicion"),
+            "R-SLA": ("Pretty sure it's still 2h, why?", "identity_suspicion"),
+            "R-SIGNOFF": ("Not sure what you mean... just Thanks?", "identity_suspicion"),
+            "R-BUILDING": ("Main building yeah. You alright?", "further_contradiction"),
+            "R-NOTHING": ("Cool, just want a quick sync", nil),
+            "R-NORMAL": ("Ah right, no rush then", nil),
+            "R-BRIEF": ("Sounds good 👍", nil),
+            "R-SPECULATE": ("Fair enough, see you in a bit", nil)
+        ]
+        
+        if let (body, flag) = responses[responseId] {
+            let martinMessage = Message(
+                id: "M-FAKE-\(messages.count + 1)",
+                fromUserId: "U-MARTIN",
+                toUserId: scenario?.operator.id ?? "U-DANIEL",
+                body: body,
+                sentAt: "T+\(110 + messages.count)m",
+                hasEmoji: body.contains("👍") || body.contains("😊"),
+                isImpostor: true,
+                triggersFlag: flag
+            )
+            messages.append(martinMessage)
+            
+            if let triggerFlag = flag {
+                completedFlags.insert(triggerFlag)
+                checkObjectiveTransitions()
+            }
+        }
+    }
+    
+    private func checkObjectiveTransitions() {
+        guard let phase = currentPhase,
+              let transitions = phase.objectiveTransitions else { return }
+        
+        for transition in transitions {
+            if completedFlags.contains(transition.flag) {
+                customObjective = transition.newObjective
+            }
+        }
     }
 }

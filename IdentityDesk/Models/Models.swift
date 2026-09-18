@@ -76,6 +76,34 @@ struct Message: Codable, Identifiable, Equatable {
     let sentAt: String
     let hasEmoji: Bool
     let isImpostor: Bool?
+    let triggersFlag: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, fromUserId, toUserId, body, sentAt, hasEmoji, isImpostor, triggersFlag
+    }
+    
+    init(id: String, fromUserId: String, toUserId: String, body: String, sentAt: String, hasEmoji: Bool, isImpostor: Bool? = nil, triggersFlag: String? = nil) {
+        self.id = id
+        self.fromUserId = fromUserId
+        self.toUserId = toUserId
+        self.body = body
+        self.sentAt = sentAt
+        self.hasEmoji = hasEmoji
+        self.isImpostor = isImpostor
+        self.triggersFlag = triggersFlag
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        fromUserId = try container.decode(String.self, forKey: .fromUserId)
+        toUserId = try container.decode(String.self, forKey: .toUserId)
+        body = try container.decode(String.self, forKey: .body)
+        sentAt = try container.decode(String.self, forKey: .sentAt)
+        hasEmoji = try container.decodeIfPresent(Bool.self, forKey: .hasEmoji) ?? false
+        isImpostor = try container.decodeIfPresent(Bool.self, forKey: .isImpostor)
+        triggersFlag = try container.decodeIfPresent(String.self, forKey: .triggersFlag)
+    }
 }
 
 struct Document: Codable, Identifiable, Equatable {
@@ -84,6 +112,34 @@ struct Document: Codable, Identifiable, Equatable {
     let body: String
     let tags: [String]
     let createdAt: String
+}
+
+struct ReplyChip: Codable, Identifiable, Equatable {
+    let id: String
+    let text: String
+    let setId: String
+    let triggersFlag: String?
+    let triggersResponse: String?
+    let isRisky: Bool?
+    
+    enum CodingKeys: String, CodingKey {
+        case id, text, setId, triggersFlag, triggersResponse, isRisky
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        text = try container.decode(String.self, forKey: .text)
+        setId = try container.decode(String.self, forKey: .setId)
+        triggersFlag = try container.decodeIfPresent(String.self, forKey: .triggersFlag)
+        triggersResponse = try container.decodeIfPresent(String.self, forKey: .triggersResponse)
+        isRisky = try container.decodeIfPresent(Bool.self, forKey: .isRisky)
+    }
+}
+
+struct ObjectiveTransition: Codable, Equatable {
+    let flag: String
+    let newObjective: String
 }
 
 struct Correlation: Identifiable, Equatable {
@@ -102,9 +158,10 @@ struct ScenarioPhase: Codable {
     let seed: PhaseSeed?
     let availableActions: [String: [String]]
     let completion: PhaseCompletion
+    let objectiveTransitions: [ObjectiveTransition]?
     
     enum CodingKeys: String, CodingKey {
-        case id, objective, teaches, dependsOn, seed, availableActions, completion
+        case id, objective, teaches, dependsOn, seed, availableActions, completion, objectiveTransitions
     }
     
     init(from decoder: Decoder) throws {
@@ -116,6 +173,7 @@ struct ScenarioPhase: Codable {
         seed = try container.decodeIfPresent(PhaseSeed.self, forKey: .seed)
         availableActions = try container.decodeIfPresent([String: [String]].self, forKey: .availableActions) ?? [:]
         completion = try container.decode(PhaseCompletion.self, forKey: .completion)
+        objectiveTransitions = try container.decodeIfPresent([ObjectiveTransition].self, forKey: .objectiveTransitions)
     }
 }
 
@@ -127,6 +185,7 @@ struct PhaseSeed: Codable {
     let entitlements: [Entitlement]?
     let messages: [Message]?
     let documents: [Document]?
+    let replyChips: [ReplyChip]?
 }
 
 struct PhaseCompletion: Codable {
