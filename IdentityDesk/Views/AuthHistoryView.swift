@@ -54,7 +54,7 @@ struct AuthEventRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(event.timestamp)
+                Text(TimeFormatter.formatScenarioTime(event.timestamp))
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                 Spacer()

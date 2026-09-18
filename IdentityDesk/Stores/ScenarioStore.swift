@@ -1,5 +1,23 @@
 import Foundation
 
+struct SavedProgress: Codable {
+    let currentPhaseIndex: Int
+    let completedFlags: Set<String>
+    let chromeRevision: String
+    let tickets: [Ticket]
+    let users: [User]
+    let authEvents: [AuthenticationEvent]
+    let departments: [Department]
+    let entitlements: [Entitlement]
+    let messages: [Message]
+    let documents: [Document]
+    let selectedTicketId: String?
+    let selectedUserId: String?
+    let selectedDepartmentId: String?
+    let selectedPolicyId: String?
+    let selectedWindow: String
+}
+
 @MainActor
 class ScenarioStore: ObservableObject {
     @Published var scenario: ScenarioData?
@@ -23,6 +41,8 @@ class ScenarioStore: ObservableObject {
     @Published var selectedDepartmentId: String?
     @Published var selectedPolicyId: String?
     @Published var selectedWindow: Window = .tickets
+    
+    private let saveKey = "IdentityDesk.SavedProgress"
     
     var operatorName: String {
         scenario?.operator.displayName ?? "Daniel"
@@ -66,6 +86,80 @@ class ScenarioStore: ObservableObject {
     
     func loadScenario() {
         loadScenario(from: nil)
+    }
+    
+    func saveProgress() {
+        let progress = SavedProgress(
+            currentPhaseIndex: currentPhaseIndex,
+            completedFlags: completedFlags,
+            chromeRevision: chromeRevision,
+            tickets: tickets,
+            users: users,
+            authEvents: authEvents,
+            departments: departments,
+            entitlements: entitlements,
+            messages: messages,
+            documents: documents,
+            selectedTicketId: selectedTicketId,
+            selectedUserId: selectedUserId,
+            selectedDepartmentId: selectedDepartmentId,
+            selectedPolicyId: selectedPolicyId,
+            selectedWindow: selectedWindow.rawValue
+        )
+        
+        if let encoded = try? JSONEncoder().encode(progress) {
+            UserDefaults.standard.set(encoded, forKey: saveKey)
+        }
+    }
+    
+    func restoreProgress() -> Bool {
+        guard let data = UserDefaults.standard.data(forKey: saveKey),
+              let progress = try? JSONDecoder().decode(SavedProgress.self, from: data) else {
+            return false
+        }
+        
+        currentPhaseIndex = progress.currentPhaseIndex
+        completedFlags = progress.completedFlags
+        chromeRevision = progress.chromeRevision
+        tickets = progress.tickets
+        users = progress.users
+        authEvents = progress.authEvents
+        departments = progress.departments
+        entitlements = progress.entitlements
+        messages = progress.messages
+        documents = progress.documents
+        selectedTicketId = progress.selectedTicketId
+        selectedUserId = progress.selectedUserId
+        selectedDepartmentId = progress.selectedDepartmentId
+        selectedPolicyId = progress.selectedPolicyId
+        if let window = Window(rawValue: progress.selectedWindow) {
+            selectedWindow = window
+        }
+        
+        return true
+    }
+    
+    func resetProgress() {
+        UserDefaults.standard.removeObject(forKey: saveKey)
+        currentPhaseIndex = 0
+        completedFlags = []
+        chromeRevision = "baseline"
+        tickets = []
+        users = []
+        authEvents = []
+        departments = []
+        entitlements = []
+        messages = []
+        documents = []
+        roles = []
+        groups = []
+        policies = []
+        selectedTicketId = nil
+        selectedUserId = nil
+        selectedDepartmentId = nil
+        selectedPolicyId = nil
+        selectedWindow = .tickets
+        loadScenario()
     }
     
     private func loadBaselineData() {
@@ -175,18 +269,21 @@ class ScenarioStore: ObservableObject {
     func resetPassword(userId: String) {
         if let index = users.firstIndex(where: { $0.id == userId }) {
             users[index].status = "ACTIVE"
+            saveProgress()
         }
     }
     
     func unlockAccount(userId: String) {
         if let index = users.firstIndex(where: { $0.id == userId }) {
             users[index].status = "ACTIVE"
+            saveProgress()
         }
     }
     
     func assignEntitlement(entitlementId: String) {
         if let index = entitlements.firstIndex(where: { $0.id == entitlementId }) {
             entitlements[index].status = "ACTIVE"
+            saveProgress()
         }
     }
     
@@ -198,6 +295,7 @@ class ScenarioStore: ObservableObject {
             tickets.remove(at: index)
             
             checkPhaseCompletion(ticketId: ticketId)
+            saveProgress()
         }
     }
     
@@ -240,6 +338,7 @@ class ScenarioStore: ObservableObject {
             }
             currentPhaseIndex += 1
             advanceToNextPhase()
+            saveProgress()
         }
     }
     

@@ -24,6 +24,7 @@
 		A10000043 /* CorrelationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000042 /* CorrelationView.swift */; };
 		A10000026 /* IdentityDeskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000025 /* IdentityDeskTests.swift */; };
 		A10000028 /* demo-vertical-slice.json in Resources */ = {isa = PBXBuildFile; fileRef = A10000023 /* demo-vertical-slice.json */; };
+		A10000044 /* TimeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000045 /* TimeFormatter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		A10000042 /* CorrelationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrelationView.swift; sourceTree = "<group>"; };
 		A10000025 /* IdentityDeskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityDeskTests.swift; sourceTree = "<group>"; };
 		A10000029 /* IdentityDeskTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IdentityDeskTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000045 /* TimeFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeFormatter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +85,7 @@
 				A1000000E /* Models */,
 				A10000041 /* Stores */,
 				A10000040 /* Views */,
+				A10000046 /* Helpers */,
 				A10000035 /* Resources */,
 				A10000004 /* Assets.xcassets */,
 			);
@@ -153,6 +156,14 @@
 				A10000023 /* demo-vertical-slice.json */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		A10000046 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				A10000045 /* TimeFormatter.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -273,6 +284,7 @@
 				A10000020 /* MessageView.swift in Sources */,
 				A10000022 /* PolicyView.swift in Sources */,
 				A10000043 /* CorrelationView.swift in Sources */,
+				A10000044 /* TimeFormatter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

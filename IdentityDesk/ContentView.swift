@@ -16,7 +16,9 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            store.loadScenario()
+            if !store.restoreProgress() {
+                store.loadScenario()
+            }
         }
     }
     
@@ -34,6 +36,19 @@ struct ContentView: View {
             }
             
             Spacer()
+            
+            Button(action: {
+                store.resetProgress()
+            }) {
+                Text("RESET")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color(red: 0.2, green: 0.2, blue: 0.2))
+                    .cornerRadius(3)
+            }
+            .buttonStyle(PlainButtonStyle())
         }
         .padding(.horizontal)
         .frame(height: 44)
