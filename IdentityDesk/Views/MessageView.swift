@@ -117,6 +117,10 @@ struct ChipButton: View {
                 .padding(.vertical, 6)
                 .background(Color(red: 0.90, green: 0.88, blue: 0.84))
                 .cornerRadius(3)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 3)
+                        .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), lineWidth: 1)
+                )
         }
         .buttonStyle(PlainButtonStyle())
     }
