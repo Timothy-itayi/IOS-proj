@@ -341,7 +341,7 @@ class ScenarioStore: ObservableObject {
     
     @discardableResult
     private func checkPhaseCompletion(ticketId: String) -> Bool {
-        guard let phase = currentPhase else { return }
+        guard let phase = currentPhase else { return false }
         let completion = phase.completion
         
         var completed = false
