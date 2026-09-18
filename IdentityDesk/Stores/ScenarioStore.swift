@@ -37,6 +37,7 @@ class ScenarioStore: ObservableObject {
     @Published var policies: [Policy] = []
     @Published var replyChips: [ReplyChip] = []
     @Published var customObjective: String?
+    @Published var showDemoComplete: Bool = false
     
     @Published var selectedTicketId: String?
     @Published var selectedUserId: String?
@@ -198,7 +199,16 @@ class ScenarioStore: ObservableObject {
     }
     
     private func loadPhaseSeed(_ phase: ScenarioPhase) {
-        guard let seed = phase.seed else { return }
+        guard let seed = phase.seed else {
+            if phase.id == "E_maintenance" {
+                completedFlags.insert("post_maintenance")
+                chromeRevision = "postMaintenance"
+                currentPhaseIndex += 1
+                advanceToNextPhase()
+                saveProgress()
+            }
+            return
+        }
         
         if let newUsers = seed.users {
             for user in newUsers {
@@ -249,6 +259,14 @@ class ScenarioStore: ObservableObject {
         if let newReplyChips = seed.replyChips {
             replyChips.append(contentsOf: newReplyChips)
         }
+        
+        if phase.id == "E_maintenance" {
+            completedFlags.insert("post_maintenance")
+            chromeRevision = "postMaintenance"
+            currentPhaseIndex += 1
+            advanceToNextPhase()
+            saveProgress()
+        }
     }
     
     func user(withId id: String) -> User? {
@@ -275,6 +293,16 @@ class ScenarioStore: ObservableObject {
     
     func availableActions(for ticketId: String) -> [String] {
         currentPhase?.availableActions[ticketId] ?? []
+    }
+    
+    func markTicketViewed(_ ticketId: String) {
+        if ticketId == "INC-7314" && currentPhase?.id == "F_sector7" {
+            completedFlags.insert("investigated_sector7")
+            completedFlags.insert("found_s7_breadcrumb")
+            currentPhaseIndex += 1
+            advanceToNextPhase()
+            saveProgress()
+        }
     }
     
     func resetPassword(userId: String) {
@@ -347,6 +375,12 @@ class ScenarioStore: ObservableObject {
             if completion.flags.contains("post_maintenance") {
                 chromeRevision = "postMaintenance"
             }
+            
+            if completion.demoEnd == true && completedFlags.contains("confirmed_impostor") {
+                customObjective = "Demo complete."
+                showDemoComplete = true
+            }
+            
             currentPhaseIndex += 1
             advanceToNextPhase()
             saveProgress()
@@ -420,6 +454,11 @@ class ScenarioStore: ObservableObject {
         if let flag = chip.triggersFlag {
             completedFlags.insert(flag)
             checkObjectiveTransitions()
+            
+            if flag == "confirmed_impostor", let phase = currentPhase, phase.completion.demoEnd == true {
+                customObjective = "Demo complete."
+                showDemoComplete = true
+            }
         }
         
         if let responseId = chip.triggersResponse {

@@ -193,9 +193,10 @@ struct PhaseCompletion: Codable {
     let userStatus: [String: String]?
     let entitlementStatus: [String: String]?
     let flags: [String]
+    let demoEnd: Bool?
     
     enum CodingKeys: String, CodingKey {
-        case ticketClosed, userStatus, entitlementStatus, flags
+        case ticketClosed, userStatus, entitlementStatus, flags, demoEnd
     }
     
     init(from decoder: Decoder) throws {
@@ -204,6 +205,7 @@ struct PhaseCompletion: Codable {
         userStatus = try container.decodeIfPresent([String: String].self, forKey: .userStatus)
         entitlementStatus = try container.decodeIfPresent([String: String].self, forKey: .entitlementStatus)
         flags = try container.decodeIfPresent([String].self, forKey: .flags) ?? []
+        demoEnd = try container.decodeIfPresent(Bool.self, forKey: .demoEnd)
     }
 }
 

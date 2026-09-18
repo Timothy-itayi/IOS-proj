@@ -5,6 +5,10 @@ struct TicketDetailView: View {
     let ticket: Ticket
     @Binding var isPresented: Bool
     @State private var notes: String = ""
+    @State private var showSuccessStatus: Bool = false
+    @State private var successStatusMessage: String = ""
+    @State private var notesHeight: CGFloat = 80
+    @State private var isNotesFieldFocused: Bool = false
     
     private var availableActions: [String] {
         store.availableActions(for: ticket.id)
@@ -16,7 +20,7 @@ struct TicketDetailView: View {
                 Color(red: 0.15, green: 0.15, blue: 0.15)
                     .ignoresSafeArea()
                 
-                ScrollView {
+                ScrollViewWithKeyboardDismissal(hideKeyboard: hideKeyboard) {
                     VStack(alignment: .leading, spacing: 16) {
                         ticketInfoSection
                         requesterSection
@@ -37,6 +41,9 @@ struct TicketDetailView: View {
                     .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
                 }
             }
+            .onAppear {
+                store.markTicketViewed(ticket.id)
+            }
         }
     }
     
@@ -56,8 +63,8 @@ struct TicketDetailView: View {
                 Text(ticket.priority)
                     .font(.system(size: 13, design: .monospaced))
                     .foregroundColor(ticket.priority == "High" ?
-                        Color(red: 1.0, green: 0.7, blue: 0.0) :
-                        Color(red: 0.15, green: 0.15, blue: 0.15))
+                        Color(red: 0.72, green: 0.29, blue: 0.23) :
+                        Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.55))
             }
             
             HStack {
@@ -117,21 +124,60 @@ struct TicketDetailView: View {
         VStack(alignment: .leading, spacing: 8) {
             FieldLabel(text: "NOTES")
             
-            if #available(iOS 16.0, *) {
-                TextEditor(text: $notes)
-                    .font(.system(size: 13, design: .monospaced))
-                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
-                    .frame(height: 80)
-                    .scrollContentBackground(.hidden)
-                    .background(Color(red: 0.95, green: 0.94, blue: 0.92))
-                    .cornerRadius(4)
-            } else {
-                TextEditor(text: $notes)
-                    .font(.system(size: 13, design: .monospaced))
-                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
-                    .frame(height: 80)
-                    .background(Color(red: 0.95, green: 0.94, blue: 0.92))
-                    .cornerRadius(4)
+            ZStack(alignment: .topLeading) {
+                if #available(iOS 16.0, *) {
+                    TextEditor(text: $notes)
+                        .font(.system(size: 13, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                        .frame(minHeight: notesHeight)
+                        .scrollContentBackground(.hidden)
+                        .background(Color(red: 0.95, green: 0.94, blue: 0.92))
+                        .cornerRadius(4)
+                        .toolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                Button("Done") {
+                                    hideKeyboard()
+                                }
+                                .font(.system(size: 14, design: .monospaced))
+                                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                            }
+                        }
+                        .onTapGesture {
+                            isNotesFieldFocused = true
+                            notesHeight = max(120, notesHeight)
+                        }
+                } else {
+                    TextEditor(text: $notes)
+                        .font(.system(size: 13, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                        .frame(minHeight: notesHeight)
+                        .background(Color(red: 0.95, green: 0.94, blue: 0.92))
+                        .cornerRadius(4)
+                        .toolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                Button("Done") {
+                                    hideKeyboard()
+                                }
+                                .font(.system(size: 14, design: .monospaced))
+                                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                            }
+                        }
+                        .onTapGesture {
+                            isNotesFieldFocused = true
+                            notesHeight = max(120, notesHeight)
+                        }
+                }
+                
+                if notes.isEmpty {
+                    Text("Case notes (saved on close)")
+                        .font(.system(size: 13, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.35))
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 8)
+                        .allowsHitTesting(false)
+                }
             }
         }
         .padding()
@@ -139,32 +185,95 @@ struct TicketDetailView: View {
     }
     
     private var actionsSection: some View {
-        VStack(spacing: 8) {
-            if availableActions.contains("resetPassword") {
-                ActionButton(title: "RESET PASSWORD", priority: ticket.priority) {
-                    store.resetPassword(userId: ticket.requesterId)
-                }
-            }
+        VStack(alignment: .leading, spacing: 12) {
+            FieldLabel(text: "ACTIONS")
             
-            if availableActions.contains("unlockAccount") {
-                ActionButton(title: "UNLOCK ACCOUNT", priority: ticket.priority, isAlert: true) {
-                    store.unlockAccount(userId: ticket.requesterId)
+            VStack(spacing: 8) {
+                if availableActions.contains("resetPassword") {
+                    ResolveButton(
+                        title: "RESET PASSWORD",
+                        successLabel: "PASSWORD RESET"
+                    ) {
+                        store.resetPassword(userId: ticket.requesterId)
+                        setSuccessStatus(message: "Status updated · User ACTIVE")
+                    }
                 }
-            }
-            
-            if availableActions.contains("assignEntitlement") {
-                ActionButton(title: "ASSIGN ENTITLEMENT", priority: ticket.priority) {
-                    if let ent = store.entitlements.first(where: { $0.userId == ticket.requesterId && $0.status == "REVOKED" }) {
-                        store.assignEntitlement(entitlementId: ent.id)
+                
+                if availableActions.contains("unlockAccount") {
+                    ResolveButton(
+                        title: "UNLOCK ACCOUNT",
+                        successLabel: "ACCOUNT UNLOCKED"
+                    ) {
+                        store.unlockAccount(userId: ticket.requesterId)
+                        setSuccessStatus(message: "Status updated · User ACTIVE")
+                    }
+                }
+                
+                if availableActions.contains("assignEntitlement") {
+                    AssignButton(
+                        ticket: ticket,
+                        store: store,
+                        onSuccess: {
+                            setSuccessStatus(message: "Status updated · Entitlement ACTIVE")
+                        }
+                    )
+                }
+                
+                if availableActions.contains("close") {
+                    ActionButton(title: "CLOSE TICKET", isPrimary: false) {
+                        store.closeTicket(ticket.id, notes: notes.isEmpty ? nil : notes)
+                        isPresented = false
                     }
                 }
             }
             
-            if availableActions.contains("close") {
-                ActionButton(title: "CLOSE TICKET", priority: ticket.priority) {
-                    store.closeTicket(ticket.id, notes: notes.isEmpty ? nil : notes)
-                    isPresented = false
+            if showSuccessStatus {
+                HStack(spacing: 8) {
+                    Text(successStatusMessage)
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.8))
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(Color(red: 0.48, green: 0.62, blue: 0.50).opacity(0.18))
+                .cornerRadius(4)
+            }
+        }
+        .padding()
+        .panelStyle()
+    }
+    
+    private func setSuccessStatus(message: String) {
+        successStatusMessage = message
+        withAnimation {
+            showSuccessStatus = true
+        }
+    }
+    
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        isNotesFieldFocused = false
+        notesHeight = 80
+    }
+}
+
+struct ScrollViewWithKeyboardDismissal<Content: View>: View {
+    let hideKeyboard: () -> Void
+    let content: () -> Content
+    
+    var body: some View {
+        if #available(iOS 16.0, *) {
+            ScrollView {
+                content()
+            }
+            .scrollDismissesKeyboard(.interactively)
+        } else {
+            ScrollView {
+                content()
+            }
+            .onTapGesture {
+                hideKeyboard()
             }
         }
     }
@@ -172,23 +281,216 @@ struct TicketDetailView: View {
 
 struct ActionButton: View {
     let title: String
-    var priority: String = "Normal"
-    var isAlert: Bool = false
+    var isPrimary: Bool = true
+    var isDisabled: Bool = false
     let action: () -> Void
     
-    private var useAmber: Bool {
-        priority == "High" || isAlert
-    }
+    @State private var isPressed: Bool = false
+    @State private var showSuccess: Bool = false
+    @State private var successLabel: String = ""
     
     var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 13, weight: .bold, design: .monospaced))
-                .foregroundColor(useAmber ? Color(red: 0.1, green: 0.1, blue: 0.1) : Color(red: 0.15, green: 0.15, blue: 0.15))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(useAmber ? Color(red: 1.0, green: 0.7, blue: 0.0) : Color(red: 0.90, green: 0.88, blue: 0.84))
-                .cornerRadius(4)
+        Button(action: {
+            if !isDisabled && !showSuccess {
+                action()
+            }
+        }) {
+            HStack(spacing: 4) {
+                if showSuccess {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 12, weight: .bold))
+                }
+                Text(showSuccess ? successLabel : title)
+                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+            }
+            .foregroundColor(buttonTextColor)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(buttonBackgroundColor)
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(buttonStrokeColor, lineWidth: isPrimary || isDisabled ? 0 : 1)
+            )
+            .scaleEffect(isPressed ? 0.98 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: isPressed)
         }
+        .buttonStyle(PlainButtonStyle())
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    if !isDisabled && !showSuccess && !isPressed {
+                        isPressed = true
+                    }
+                }
+                .onEnded { _ in
+                    if isPressed {
+                        isPressed = false
+                    }
+                }
+        )
+        .disabled(isDisabled || showSuccess)
+    }
+    
+    private var buttonTextColor: Color {
+        if showSuccess {
+            return Color(red: 0.96, green: 0.94, blue: 0.90)
+        }
+        if isDisabled {
+            return Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.30)
+        }
+        if isPrimary {
+            return Color(red: 0.96, green: 0.94, blue: 0.90)
+        }
+        return Color(red: 0.15, green: 0.15, blue: 0.15)
+    }
+    
+    private var buttonBackgroundColor: Color {
+        if showSuccess {
+            return Color(red: 0.48, green: 0.62, blue: 0.50)
+        }
+        if isDisabled {
+            return Color(red: 0.90, green: 0.88, blue: 0.84)
+        }
+        if isPrimary {
+            let baseColor = Color(red: 0.15, green: 0.15, blue: 0.15)
+            return isPressed ? baseColor.opacity(0.88) : baseColor
+        }
+        let baseColor = Color(red: 0.90, green: 0.88, blue: 0.84)
+        return isPressed ? baseColor.opacity(0.88) : baseColor
+    }
+    
+    private var buttonStrokeColor: Color {
+        if isDisabled {
+            return Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.30)
+        }
+        return Color(red: 0.15, green: 0.15, blue: 0.15)
+    }
+    
+    func triggerSuccess(label: String) {
+        successLabel = label
+        withAnimation {
+            showSuccess = true
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+            withAnimation {
+                showSuccess = true
+            }
+        }
+    }
+}
+
+struct ResolveButton: View {
+    let title: String
+    let successLabel: String
+    let action: () -> Void
+    
+    @State private var isPressed: Bool = false
+    @State private var showSuccess: Bool = false
+    
+    var body: some View {
+        Button(action: {
+            if !showSuccess {
+                action()
+                withAnimation {
+                    showSuccess = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                }
+            }
+        }) {
+            HStack(spacing: 4) {
+                if showSuccess {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 12, weight: .bold))
+                }
+                Text(showSuccess ? successLabel : title)
+                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+            }
+            .foregroundColor(showSuccess ? Color(red: 0.96, green: 0.94, blue: 0.90) : Color(red: 0.96, green: 0.94, blue: 0.90))
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(showSuccess ? Color(red: 0.48, green: 0.62, blue: 0.50) : (isPressed ? Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.88) : Color(red: 0.15, green: 0.15, blue: 0.15)))
+            .cornerRadius(8)
+            .scaleEffect(isPressed ? 0.98 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: isPressed)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    if !showSuccess && !isPressed {
+                        isPressed = true
+                    }
+                }
+                .onEnded { _ in
+                    if isPressed {
+                        isPressed = false
+                    }
+                }
+        )
+        .disabled(showSuccess)
+    }
+}
+
+struct AssignButton: View {
+    let ticket: Ticket
+    @ObservedObject var store: ScenarioStore
+    let onSuccess: () -> Void
+    
+    @State private var isPressed: Bool = false
+    @State private var showSuccess: Bool = false
+    @State private var showNothingToAssign: Bool = false
+    
+    var body: some View {
+        Button(action: {
+            if !showSuccess && !showNothingToAssign {
+                if let ent = store.entitlements.first(where: { $0.userId == ticket.requesterId && $0.status == "REVOKED" }) {
+                    store.assignEntitlement(entitlementId: ent.id)
+                    withAnimation {
+                        showSuccess = true
+                    }
+                    onSuccess()
+                } else {
+                    withAnimation {
+                        showNothingToAssign = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        withAnimation {
+                            showNothingToAssign = false
+                        }
+                    }
+                }
+            }
+        }) {
+            HStack(spacing: 4) {
+                if showSuccess {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 12, weight: .bold))
+                }
+                Text(showSuccess ? "ENTITLEMENT ASSIGNED" : (showNothingToAssign ? "NOTHING TO ASSIGN" : "ASSIGN ENTITLEMENT"))
+                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+            }
+            .foregroundColor(showSuccess ? Color(red: 0.96, green: 0.94, blue: 0.90) : Color(red: 0.96, green: 0.94, blue: 0.90))
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(showSuccess ? Color(red: 0.48, green: 0.62, blue: 0.50) : (isPressed ? Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.88) : Color(red: 0.15, green: 0.15, blue: 0.15)))
+            .cornerRadius(8)
+            .scaleEffect(isPressed ? 0.98 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: isPressed)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    if !showSuccess && !showNothingToAssign && !isPressed {
+                        isPressed = true
+                    }
+                }
+                .onEnded { _ in
+                    if isPressed {
+                        isPressed = false
+                    }
+                }
+        )
+        .disabled(showSuccess)
     }
 }
