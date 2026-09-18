@@ -5,6 +5,7 @@ class ScenarioStore: ObservableObject {
     @Published var scenario: ScenarioData?
     @Published var currentPhaseIndex: Int = 0
     @Published var completedFlags: Set<String> = []
+    @Published var chromeRevision: String = "baseline"
     
     @Published var tickets: [Ticket] = []
     @Published var users: [User] = []
@@ -21,6 +22,7 @@ class ScenarioStore: ObservableObject {
     @Published var selectedUserId: String?
     @Published var selectedDepartmentId: String?
     @Published var selectedPolicyId: String?
+    @Published var selectedWindow: Window = .tickets
     
     var operatorName: String {
         scenario?.operator.displayName ?? "Daniel"
@@ -233,6 +235,9 @@ class ScenarioStore: ObservableObject {
         
         if completed {
             completedFlags.formUnion(completion.flags)
+            if completion.flags.contains("post_maintenance") {
+                chromeRevision = "postMaintenance"
+            }
             currentPhaseIndex += 1
             advanceToNextPhase()
         }

@@ -86,6 +86,14 @@ struct Document: Codable, Identifiable, Equatable {
     let createdAt: String
 }
 
+struct Correlation: Identifiable, Equatable {
+    let id: String
+    let ticketId: String?
+    let userId: String?
+    let departmentId: String?
+    let description: String
+}
+
 struct ScenarioPhase: Codable {
     let id: String
     let objective: String
@@ -103,7 +111,7 @@ struct ScenarioPhase: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         objective = try container.decode(String.self, forKey: .objective)
-        teaches = try container.decode([String].self, forKey: .teaches)
+        teaches = try container.decodeIfPresent([String].self, forKey: .teaches) ?? []
         dependsOn = try container.decodeIfPresent([String].self, forKey: .dependsOn)
         seed = try container.decodeIfPresent(PhaseSeed.self, forKey: .seed)
         availableActions = try container.decodeIfPresent([String: [String]].self, forKey: .availableActions) ?? [:]
@@ -166,6 +174,7 @@ enum Window: String, CaseIterable {
     case user = "User"
     case dept = "Dept"
     case access = "Access"
+    case correlation = "Correlation"
     case msg = "Msg"
 }
 

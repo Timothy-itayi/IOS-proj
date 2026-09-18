@@ -2,6 +2,7 @@ import SwiftUI
 
 struct UserProfileView: View {
     @ObservedObject var store: ScenarioStore
+    @State private var showingAuthHistory = false
     
     private var selectedUser: User? {
         guard let userId = store.selectedUserId else { return nil }
@@ -17,6 +18,13 @@ struct UserProfileView: View {
                     authHistoryButton(user: user)
                 }
                 .padding()
+                .sheet(isPresented: $showingAuthHistory) {
+                    if let user = selectedUser {
+                        NavigationView {
+                            AuthHistoryView(store: store, userId: user.id)
+                        }
+                    }
+                }
             } else {
                 Text("No user selected")
                     .font(.system(size: 13, design: .monospaced))
@@ -85,6 +93,7 @@ struct UserProfileView: View {
                 if let dept = store.department(withId: user.departmentId) {
                     Button(action: {
                         store.selectedDepartmentId = dept.id
+                        store.selectedWindow = .dept
                     }) {
                         Text(dept.name)
                             .font(.system(size: 13, design: .monospaced))
@@ -93,6 +102,18 @@ struct UserProfileView: View {
                 } else {
                     EmptyFieldText(value: nil)
                         .font(.system(size: 13, design: .monospaced))
+                }
+            }
+            
+            if store.chromeRevision == "postMaintenance" {
+                HStack {
+                    Text("Relationship")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
+                    Spacer()
+                    Text("Direct")
+                        .font(.system(size: 13, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                 }
             }
             
@@ -120,10 +141,16 @@ struct UserProfileView: View {
     }
     
     private func authHistoryButton(user: User) -> some View {
-        NavigationLink(destination: AuthHistoryView(store: store, userId: user.id)) {
+        Button(action: {
+            showingAuthHistory = true
+        }) {
             HStack {
                 Text("View Authentication History")
+ cursor/identity-desk-ios-app-714b
                     .font(.system(size: 13, design: .monospaced))
+
+                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+ main
                 Spacer()
                 Text("→")
             }

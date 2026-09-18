@@ -41,13 +41,13 @@ struct AuthEventRow: View {
     private var resultColor: Color {
         switch event.result {
         case "success":
-            return Color(red: 0.85, green: 0.82, blue: 0.75)
+            return Color(red: 0.15, green: 0.15, blue: 0.15)
         case "fail":
             return Color(red: 1.0, green: 0.7, blue: 0.0)
         case "lockout":
             return Color(red: 1.0, green: 0.3, blue: 0.0)
         default:
-            return Color(red: 0.85, green: 0.82, blue: 0.75)
+            return Color(red: 0.15, green: 0.15, blue: 0.15)
         }
     }
     
@@ -56,7 +56,7 @@ struct AuthEventRow: View {
             HStack {
                 Text(event.timestamp)
                     .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                 Spacer()
                 Text(event.result.uppercased())
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
@@ -65,7 +65,7 @@ struct AuthEventRow: View {
             
             Text(event.reason)
                 .font(.system(size: 13, design: .monospaced))
-                .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
         }
         .padding()
         .panelStyle()

@@ -47,8 +47,19 @@ struct DepartmentView: View {
                     .font(.system(size: 12, design: .monospaced))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                 Spacer()
-                EmptyFieldText(value: store.user(withId: dept.headId ?? "")?.displayName)
-                    .font(.system(size: 13, design: .monospaced))
+                if let head = store.user(withId: dept.headId ?? "") {
+                    Button(action: {
+                        store.selectedUserId = head.id
+                        store.selectedWindow = .user
+                    }) {
+                        Text(head.displayName)
+                            .font(.system(size: 13, design: .monospaced))
+                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
+                    }
+                } else {
+                    EmptyFieldText(value: nil)
+                        .font(.system(size: 13, design: .monospaced))
+                }
             }
             
             HStack {
@@ -56,8 +67,19 @@ struct DepartmentView: View {
                     .font(.system(size: 12, design: .monospaced))
                     .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.5))
                 Spacer()
-                EmptyFieldText(value: store.user(withId: dept.managerId ?? "")?.displayName)
-                    .font(.system(size: 13, design: .monospaced))
+                if let manager = store.user(withId: dept.managerId ?? "") {
+                    Button(action: {
+                        store.selectedUserId = manager.id
+                        store.selectedWindow = .user
+                    }) {
+                        Text(manager.displayName)
+                            .font(.system(size: 13, design: .monospaced))
+                            .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
+                    }
+                } else {
+                    EmptyFieldText(value: nil)
+                        .font(.system(size: 13, design: .monospaced))
+                }
             }
             
             HStack {
