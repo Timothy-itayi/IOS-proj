@@ -20,7 +20,7 @@ struct TicketDetailView: View {
                 Color(red: 0.15, green: 0.15, blue: 0.15)
                     .ignoresSafeArea()
                 
-                ScrollView {
+                ScrollViewWithKeyboardDismissal(hideKeyboard: hideKeyboard) {
                     VStack(alignment: .leading, spacing: 16) {
                         ticketInfoSection
                         requesterSection
@@ -29,14 +29,6 @@ struct TicketDetailView: View {
                         actionsSection
                     }
                     .padding()
-                }
-                .if(available: iOS16OrLater) { view in
-                    view.scrollDismissesKeyboard(.interactively)
-                }
-                .if(available: !iOS16OrLater) { view in
-                    view.onTapGesture {
-                        hideKeyboard()
-                    }
                 }
             }
             .navigationTitle(ticket.id)
@@ -192,17 +184,31 @@ struct TicketDetailView: View {
         .panelStyle()
     }
     
-    private var iOS16OrLater: Bool {
-        if #available(iOS 16.0, *) {
-            return true
-        }
-        return false
-    }
-    
     private func hideKeyboard() {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         isNotesFieldFocused = false
         notesHeight = 80
+    }
+}
+
+struct ScrollViewWithKeyboardDismissal<Content: View>: View {
+    let hideKeyboard: () -> Void
+    let content: () -> Content
+    
+    var body: some View {
+        if #available(iOS 16.0, *) {
+            ScrollView {
+                content()
+            }
+            .scrollDismissesKeyboard(.interactively)
+        } else {
+            ScrollView {
+                content()
+            }
+            .onTapGesture {
+                hideKeyboard()
+            }
+        }
     }
     
     private var actionsSection: some View {
@@ -486,16 +492,5 @@ struct AssignButton: View {
                 }
         )
         .disabled(showSuccess)
-    }
-}
-
-extension View {
-    @ViewBuilder
-    func `if`<Content: View>(available condition: Bool, transform: (Self) -> Content) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
-        }
     }
 }
