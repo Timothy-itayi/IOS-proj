@@ -288,4 +288,27 @@ final class PhaseATests: XCTestCase {
         let policy = store.policy(withId: sector7Ent?.policyId)
         XCTAssertNil(policy, "Policy lookup should return nil")
     }
+    
+    func testResetProgressClearsDataAndRestartsDemo() {
+        // Advance to Phase B first
+        store.closeTicket("INC-7001", notes: "Resolved")
+        
+        XCTAssertEqual(store.currentPhase?.id, "B_account_unlock", "Should be on Phase B")
+        XCTAssertTrue(store.completedFlags.contains("learned_password_reset"), "Should have completion flag")
+        XCTAssertGreaterThan(store.currentPhaseIndex, 0, "Phase index should be > 0")
+        
+        // Now reset
+        store.resetProgress()
+        
+        // Verify state reset
+        XCTAssertEqual(store.currentPhaseIndex, 0, "Phase index should reset to 0")
+        XCTAssertEqual(store.completedFlags.count, 0, "Completed flags should be cleared")
+        XCTAssertEqual(store.chromeRevision, "baseline", "Chrome revision should reset to baseline")
+        XCTAssertEqual(store.selectedWindow, .tickets, "Selected window should reset to tickets")
+        
+        // Verify data reloaded
+        XCTAssertEqual(store.currentPhase?.id, "A_sarah_password_reset", "Should be back on Phase A")
+        XCTAssertNotNil(store.tickets.first { $0.id == "INC-7001" }, "Phase A ticket should exist again")
+        XCTAssertNil(store.tickets.first { $0.id == "INC-7002" }, "Phase B ticket should not exist")
+    }
 }

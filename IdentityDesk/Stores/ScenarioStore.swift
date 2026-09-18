@@ -266,4 +266,26 @@ class ScenarioStore: ObservableObject {
         guard let operatorId = scenario?.operator.id else { return [] }
         return messages.filter { $0.toUserId == operatorId }.sorted { $0.sentAt < $1.sentAt }
     }
+    
+    func resetProgress() {
+        currentPhaseIndex = 0
+        completedFlags.removeAll()
+        chromeRevision = "baseline"
+        
+        tickets.removeAll()
+        users.removeAll()
+        authEvents.removeAll()
+        departments.removeAll()
+        entitlements.removeAll()
+        messages.removeAll()
+        documents.removeAll()
+        
+        selectedTicketId = nil
+        selectedUserId = nil
+        selectedDepartmentId = nil
+        selectedPolicyId = nil
+        selectedWindow = .tickets
+        
+        loadScenario()
+    }
 }
