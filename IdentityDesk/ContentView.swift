@@ -48,13 +48,14 @@ struct ContentView: View {
                 showResetConfirmation = true
             }) {
                 Text("RESET")
-                    .font(.system(size: 12, weight: .medium, design: .monospaced))
-                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color(red: 0.90, green: 0.88, blue: 0.84))
-                    .cornerRadius(4)
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color(red: 0.2, green: 0.2, blue: 0.2))
+                    .cornerRadius(3)
             }
+            .buttonStyle(PlainButtonStyle())
         }
         .padding(.horizontal)
         .frame(height: 44)
