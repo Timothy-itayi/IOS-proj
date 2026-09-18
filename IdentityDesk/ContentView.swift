@@ -197,7 +197,11 @@ struct ResetConfirmationView: View {
                         .background(Color.clear)
                         .overlay(
                             RoundedRectangle(cornerRadius: 4)
+
                                 .stroke(Color(red: 0.90, green: 0.88, blue: 0.84), lineWidth: 1)
+
+                                .stroke(Color(red: 0.15, green: 0.15, blue: 0.15), lineWidth: 1)
+
                         )
                 }
                 
@@ -207,10 +211,17 @@ struct ResetConfirmationView: View {
                 }) {
                     Text("Reset")
                         .font(.system(size: 14, weight: .medium, design: .monospaced))
+ cursor/playtest-bugfixes-465e
                         .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                         .background(Color(red: 0.90, green: 0.88, blue: 0.84))
+
+                        .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color(red: 0.15, green: 0.15, blue: 0.15))
+
                         .cornerRadius(4)
                 }
             }

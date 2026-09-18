@@ -374,7 +374,7 @@ class ScenarioStore: ObservableObject {
     
     func messagesForOperator() -> [Message] {
         guard let operatorId = scenario?.operator.id else { return [] }
-        return messages.filter { $0.toUserId == operatorId }.sorted { $0.sentAt < $1.sentAt }
+        return messages.filter { $0.toUserId == operatorId || $0.fromUserId == operatorId }.sorted { $0.sentAt < $1.sentAt }
     }
     
     func availableReplyChips() -> [ReplyChip] {
@@ -440,7 +440,8 @@ class ScenarioStore: ObservableObject {
             "R-NOTHING": ("Cool, just want a quick sync", nil),
             "R-NORMAL": ("Ah right, no rush then", nil),
             "R-BRIEF": ("Sounds good 👍", nil),
-            "R-SPECULATE": ("Fair enough, see you in a bit", nil)
+            "R-SPECULATE": ("Fair enough, see you in a bit", nil),
+            "R-SECTOR7": ("Not sure what that's about. Let's chat in person.", nil)
         ]
         
         if let (body, flag) = responses[responseId] {
