@@ -264,6 +264,6 @@ class ScenarioStore: ObservableObject {
     
     func messagesForOperator() -> [Message] {
         guard let operatorId = scenario?.operator.id else { return [] }
-        return messages.filter { $0.toUserId == operatorId }.sorted { $0.sentAt < $1.sentAt }
+        return messages.filter { $0.toUserId == operatorId || $0.fromUserId == operatorId }.sorted { $0.sentAt < $1.sentAt }
     }
 }
