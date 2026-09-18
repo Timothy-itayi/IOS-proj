@@ -84,7 +84,7 @@ struct ReplyChipStrip: View {
             ChipWrapView(chips: chips, store: store)
         }
         .padding()
-        .background(Color(red: 0.90, green: 0.88, blue: 0.84).opacity(0.3))
+        .background(Color(red: 0.90, green: 0.88, blue: 0.84))
         .cornerRadius(4)
     }
 }
@@ -94,57 +94,11 @@ struct ChipWrapView: View {
     @ObservedObject var store: ScenarioStore
     
     var body: some View {
-        GeometryReader { geometry in
-            self.generateContent(in: geometry)
-        }
-        .frame(height: calculateHeight())
-    }
-    
-    private func generateContent(in geometry: GeometryProxy) -> some View {
-        var width: CGFloat = 0
-        var height: CGFloat = 0
-        var lastHeight: CGFloat = 0
-        
-        return ZStack(alignment: .topLeading) {
-            ForEach(Array(chips.enumerated()), id: \.element.id) { index, chip in
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 300), spacing: 8)], spacing: 8) {
+            ForEach(chips) { chip in
                 ChipButton(chip: chip, store: store)
-                    .padding(.trailing, 8)
-                    .padding(.bottom, 8)
-                    .alignmentGuide(.leading, computeValue: { dimension in
-                        if abs(width - dimension.width) > geometry.size.width {
-                            width = 0
-                            height -= lastHeight
-                        }
-                        lastHeight = dimension.height
-                        let result = width
-                        if chips.indices.contains(index + 1) {
-                            width -= dimension.width + 8
-                        } else {
-                            width = 0
-                        }
-                        return result
-                    })
-                    .alignmentGuide(.top, computeValue: { dimension in
-                        let result = height
-                        if chips.indices.contains(index + 1) {
-                            lastHeight = dimension.height
-                        } else {
-                            height = 0
-                        }
-                        return result
-                    })
             }
         }
-    }
-    
-    private func calculateHeight() -> CGFloat {
-        var height: CGFloat = 44
-        let chipCount = chips.count
-        if chipCount > 0 {
-            let estimatedRows = max(1, chipCount / 2)
-            height = CGFloat(estimatedRows) * 44
-        }
-        return height
     }
 }
 
