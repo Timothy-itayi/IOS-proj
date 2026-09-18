@@ -184,33 +184,6 @@ struct TicketDetailView: View {
         .panelStyle()
     }
     
-    private func hideKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        isNotesFieldFocused = false
-        notesHeight = 80
-    }
-}
-
-struct ScrollViewWithKeyboardDismissal<Content: View>: View {
-    let hideKeyboard: () -> Void
-    let content: () -> Content
-    
-    var body: some View {
-        if #available(iOS 16.0, *) {
-            ScrollView {
-                content()
-            }
-            .scrollDismissesKeyboard(.interactively)
-        } else {
-            ScrollView {
-                content()
-            }
-            .onTapGesture {
-                hideKeyboard()
-            }
-        }
-    }
-    
     private var actionsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             FieldLabel(text: "ACTIONS")
@@ -275,6 +248,33 @@ struct ScrollViewWithKeyboardDismissal<Content: View>: View {
         successStatusMessage = message
         withAnimation {
             showSuccessStatus = true
+        }
+    }
+    
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        isNotesFieldFocused = false
+        notesHeight = 80
+    }
+}
+
+struct ScrollViewWithKeyboardDismissal<Content: View>: View {
+    let hideKeyboard: () -> Void
+    let content: () -> Content
+    
+    var body: some View {
+        if #available(iOS 16.0, *) {
+            ScrollView {
+                content()
+            }
+            .scrollDismissesKeyboard(.interactively)
+        } else {
+            ScrollView {
+                content()
+            }
+            .onTapGesture {
+                hideKeyboard()
+            }
         }
     }
 }
