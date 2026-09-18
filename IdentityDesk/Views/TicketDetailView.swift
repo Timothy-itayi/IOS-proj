@@ -371,12 +371,6 @@ struct ActionButton: View {
         withAnimation {
             showSuccess = true
         }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            withAnimation {
-                showSuccess = true
-            }
-        }
     }
 }
 
@@ -394,8 +388,6 @@ struct ResolveButton: View {
                 action()
                 withAnimation {
                     showSuccess = true
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                 }
             }
         }) {
@@ -454,7 +446,8 @@ struct AssignButton: View {
                     withAnimation {
                         showNothingToAssign = true
                     }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                    Task { @MainActor in
+                        try? await Task.sleep(nanoseconds: 1_200_000_000)
                         withAnimation {
                             showNothingToAssign = false
                         }
