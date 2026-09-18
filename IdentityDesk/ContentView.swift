@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var store = ScenarioStore()
+    @State private var showResetConfirmation = false
     
     var body: some View {
         ZStack {
@@ -19,6 +20,14 @@ struct ContentView: View {
             if !store.restoreProgress() {
                 store.loadScenario()
             }
+        }
+        .sheet(isPresented: $showResetConfirmation) {
+            ResetConfirmationView(
+                isPresented: $showResetConfirmation,
+                onConfirm: {
+                    store.resetProgress()
+                }
+            )
         }
     }
     
@@ -38,17 +47,16 @@ struct ContentView: View {
             Spacer()
             
             Button(action: {
-                store.resetProgress()
+                showResetConfirmation = true
             }) {
                 Text("RESET")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .foregroundColor(Color(red: 0.85, green: 0.82, blue: 0.75).opacity(0.7))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color(red: 0.2, green: 0.2, blue: 0.2))
-                    .cornerRadius(3)
+                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color(red: 0.90, green: 0.88, blue: 0.84))
+                    .cornerRadius(4)
             }
-            .buttonStyle(PlainButtonStyle())
         }
         .padding(.horizontal)
         .frame(height: 44)
@@ -156,5 +164,59 @@ struct PanelBackground: ViewModifier {
 extension View {
     func panelStyle() -> some View {
         modifier(PanelBackground())
+    }
+}
+
+struct ResetConfirmationView: View {
+    @Binding var isPresented: Bool
+    let onConfirm: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Reset progress?")
+                    .font(.system(size: 17, weight: .semibold, design: .monospaced))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                
+                Text("This clears save data and restarts the demo.")
+                    .font(.system(size: 14, design: .monospaced))
+                    .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15).opacity(0.7))
+            }
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            HStack(spacing: 12) {
+                Button(action: {
+                    isPresented = false
+                }) {
+                    Text("Cancel")
+                        .font(.system(size: 14, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 4)
+                                .stroke(Color(red: 0.90, green: 0.88, blue: 0.84), lineWidth: 1)
+                        )
+                }
+                
+                Button(action: {
+                    isPresented = false
+                    onConfirm()
+                }) {
+                    Text("Reset")
+                        .font(.system(size: 14, weight: .medium, design: .monospaced))
+                        .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color(red: 0.90, green: 0.88, blue: 0.84))
+                        .cornerRadius(4)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
+        }
+        .background(Color(red: 0.90, green: 0.88, blue: 0.84))
     }
 }

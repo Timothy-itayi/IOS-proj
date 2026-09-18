@@ -159,6 +159,8 @@ class ScenarioStore: ObservableObject {
         roles = []
         groups = []
         policies = []
+        replyChips = []
+        customObjective = nil
         selectedTicketId = nil
         selectedUserId = nil
         selectedDepartmentId = nil
